@@ -1,0 +1,156 @@
+plugins {
+    id 'java'
+    // ASSUMES GRADLE 5.6 OR HIGHER. Use plugin version 0.8.10 with earlier gradle versions
+    id 'com.google.protobuf' version '0.8.18'
+    // Generate IntelliJ IDEA's .idea & .iml project files
+    id 'idea'
+
+    id "io.freefair.lombok" version "6.5.0.3"
+
+    id 'application'
+
+    id 'checkstyle'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+repositories {
+    maven { // The google mirror is less flaky than mavenCentral()
+        url "https://maven-central.storage-download.googleapis.com/maven2/" }
+    mavenCentral()
+}
+
+def grpcVersion = '1.48.0' // CURRENT_GRPC_VERSION
+def protobufVersion = '3.21.1'
+def protocVersion = protobufVersion
+
+
+dependencies {
+    implementation 'io.dapr:dapr-sdk:1.6.0'
+
+    // GRPC
+    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+    implementation "io.grpc:grpc-stub:${grpcVersion}"
+
+    // gRPC - Netty for using UnixDomainSockets
+    implementation "io.grpc:grpc-netty:${grpcVersion}"
+    runtimeOnly "io.grpc:grpc-netty-shaded:${grpcVersion}"
+    // grpc-grpc-java: How to connect to unix socket? - https://github.com/grpc/grpc-java/issues/1539
+    implementation 'io.netty:netty-transport-native-epoll:4.1.79.Final:linux-x86_64'
+    implementation 'io.netty:netty-transport-native-kqueue:4.1.79.Final:osx-x86_64'
+
+    compileOnly "org.apache.tomcat:annotations-api:6.0.53"
+
+    // Life is too short to parse command line arguments
+    implementation 'com.beust:jcommander:1.82'
+
+
+    // examples/advanced need this for JsonFormat
+    implementation "com.google.protobuf:protobuf-java-util:${protobufVersion}"
+
+
+    testImplementation "io.grpc:grpc-testing:${grpcVersion}"
+
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+protobuf {
+    protoc { artifact = "com.google.protobuf:protoc:${protocVersion}" }
+    plugins {
+        grpc { artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}" }
+    }
+    generateProtoTasks {
+        all()*.plugins { grpc {} }
+    }
+}
+
+// IntelliJ apparently knows how to figure out the whole source thing but
+// VS code was having a hard time finding gRPC-related java generated 
+// source files. Explicitly setting source seems do do the trick.
+// https://stackoverflow.com/questions/72440517/
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src/main/java'
+            srcDir "${protobuf.generatedFilesBaseDir}/main/java"
+            srcDir "${protobuf.generatedFilesBaseDir}/main/grpc"
+        }
+
+        proto {
+            srcDir "${rootProject.projectDir}/proto"
+        }
+
+        resources {
+            srcDir 'src/main/resources'
+        }
+    }
+}
+
+
+//
+// Checkstyle configuration and targets
+//
+
+checkstyle {
+    // we should probably anchor toolVersion
+    configFile rootProject.file('checkstyle.xml')
+    configDirectory.set( rootProject.getProjectDir() )
+    showViolations true
+    // Fail on checkstyle errors
+    ignoreFailures = false
+    maxWarnings = 0
+}
+
+checkstyleMain {
+    source = 'src/main/java'
+}
+
+checkstyleTest {
+    source = 'src/test/java'
+}
+
+// define a target to ease invoking checkstyle verification from the command line.
+task checkstyle(dependsOn:['checkstyleMain', 'checkstyleTest']){
+    description 'Runs Checkstyle inspection on main and test sourcesets.'
+    group = 'Code Quality'
+}
+
+
+//
+// Configuration and specific targets to generate CLI applications
+//
+
+// adds `run` target
+application {
+    mainClass = 'org.example.StateStoreComponentServer'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+startScripts.enabled = false
+
+task stateStoreComponentServerApplication(type: CreateStartScripts) {
+    mainClass = 'org.example.StateStoreComponentServer'
+    applicationName = 'state-store-component-server'
+    outputDir = new File(project.buildDir, 'tmp2/scripts/' + name)
+    classpath = startScripts.classpath
+}
+
+task pubSubComponentServerApplication(type: CreateStartScripts) {
+    mainClass = 'org.example.PubSubComponentServer'
+    applicationName = 'pub-sub-component-server'
+    outputDir = new File(project.buildDir, 'tmp2/scripts/' + name)
+    classpath = startScripts.classpath
+}
+
+applicationDistribution.into('bin') {
+    from(stateStoreComponentServerApplication)
+    from(pubSubComponentServerApplication)
+    fileMode = 0755
+}
