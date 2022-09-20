@@ -14,21 +14,28 @@
 package io.dapr.components.wrappers;
 
 import com.google.protobuf.ByteString;
-import com.google.protobuf.Empty;
 import dapr.proto.components.v1.State.BulkDeleteRequest;
+import dapr.proto.components.v1.State.BulkDeleteResponse;
 import dapr.proto.components.v1.State.BulkGetRequest;
 import dapr.proto.components.v1.State.BulkGetResponse;
 import dapr.proto.components.v1.State.BulkSetRequest;
+import dapr.proto.components.v1.State.BulkSetResponse;
 import dapr.proto.components.v1.State.BulkStateItem;
 import dapr.proto.components.v1.State.DeleteRequest;
+import dapr.proto.components.v1.State.DeleteResponse;
 import dapr.proto.components.v1.State.GetRequest;
 import dapr.proto.components.v1.State.GetResponse;
+import dapr.proto.components.v1.State.InitRequest;
+import dapr.proto.components.v1.State.InitResponse;
 import dapr.proto.components.v1.State.SetRequest;
+import dapr.proto.components.v1.State.SetResponse;
 import dapr.proto.components.v1.StateStoreGrpc;
 import io.dapr.components.StateStore;
 import io.dapr.v1.CommonProtos.Etag;
+import io.dapr.v1.ComponentProtos.FeaturesRequest;
 import io.dapr.v1.ComponentProtos.FeaturesResponse;
-import io.dapr.v1.ComponentProtos.MetadataRequest;
+import io.dapr.v1.ComponentProtos.PingRequest;
+import io.dapr.v1.ComponentProtos.PingResponse;
 import io.grpc.stub.StreamObserver;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -61,29 +68,34 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
   private final StateStore stateStore;
 
   @Override
-  public void init(@NonNull final MetadataRequest request, @NonNull final StreamObserver<Empty> responseObserver) {
-    stateStore.init(request.getPropertiesMap());
-    returnEmptyResponse(responseObserver);
+  public void init(@NonNull final InitRequest request, @NonNull final StreamObserver<InitResponse> responseObserver) {
+    stateStore.init(request.getMetadata().getPropertiesMap());
+    responseObserver.onNext(InitResponse.getDefaultInstance());
+    responseObserver.onCompleted();
   }
 
   @Override
-  public void features(@NonNull final Empty request, @NonNull final StreamObserver<FeaturesResponse> responseObserver) {
+  public void features(@NonNull final FeaturesRequest request,
+                       @NonNull final StreamObserver<FeaturesResponse> responseObserver) {
     final FeaturesResponse response = FeaturesResponse.newBuilder().addAllFeature(stateStore.getFeatures()).build();
     responseObserver.onNext(response);
     responseObserver.onCompleted();
   }
 
   @Override
-  public void delete(@NonNull final DeleteRequest request, @NonNull final StreamObserver<Empty> responseObserver) {
+  public void delete(@NonNull final DeleteRequest request,
+                     @NonNull final StreamObserver<DeleteResponse> responseObserver) {
     singleItemDelete(request);
-    returnEmptyResponse(responseObserver);
+    responseObserver.onNext(DeleteResponse.getDefaultInstance());
+    responseObserver.onCompleted();
   }
 
   @Override
   public void bulkDelete(@NonNull final BulkDeleteRequest request,
-                         @NonNull final StreamObserver<Empty> responseObserver) {
+                         @NonNull final StreamObserver<BulkDeleteResponse> responseObserver) {
     request.getItemsList().forEach(this::singleItemDelete);
-    returnEmptyResponse(responseObserver);
+    responseObserver.onNext(BulkDeleteResponse.getDefaultInstance());
+    responseObserver.onCompleted();
   }
 
   private void singleItemDelete(@NotNull DeleteRequest request) {
@@ -126,15 +138,18 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
   }
 
   @Override
-  public void set(@NonNull final SetRequest request, @NonNull final StreamObserver<Empty> responseObserver) {
+  public void set(@NonNull final SetRequest request, @NonNull final StreamObserver<SetResponse> responseObserver) {
     singleItemSet(request);
-    returnEmptyResponse(responseObserver);
+    responseObserver.onNext(SetResponse.getDefaultInstance());
+    responseObserver.onCompleted();
   }
 
   @Override
-  public void bulkSet(@NonNull final BulkSetRequest request, @NonNull final StreamObserver<Empty> responseObserver) {
+  public void bulkSet(@NonNull final BulkSetRequest request,
+                      @NonNull final StreamObserver<BulkSetResponse> responseObserver) {
     request.getItemsList().forEach(this::singleItemSet);
-    returnEmptyResponse(responseObserver);
+    responseObserver.onNext(BulkSetResponse.getDefaultInstance());
+    responseObserver.onCompleted();
   }
 
   private void singleItemSet(@NotNull final SetRequest request) {
@@ -144,13 +159,10 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
   }
 
   @Override
-  public void ping(@NonNull final Empty request, @NonNull final StreamObserver<Empty> responseObserver) {
+  public void ping(@NonNull final PingRequest request, @NonNull final StreamObserver<PingResponse> responseObserver) {
     log.info("Ping invoked.");
-    returnEmptyResponse(responseObserver);
-  }
-
-  private static void returnEmptyResponse(@NonNull final StreamObserver<Empty> responseObserver) {
-    responseObserver.onNext(Empty.getDefaultInstance());
+    responseObserver.onNext(PingResponse.getDefaultInstance());
     responseObserver.onCompleted();
   }
+
 }
