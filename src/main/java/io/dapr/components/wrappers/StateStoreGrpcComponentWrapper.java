@@ -108,8 +108,10 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
 
     final GetResponse response = stateStore.get(key)
         // If value is present, map it to an appropriate GetResponse object
-        .map(value -> GetResponse.newBuilder().setData(ByteString.copyFrom(value.getData()))
-            .setEtag(Etag.newBuilder().setValue(value.getEtag()).build()).build())
+        .map(value -> GetResponse.newBuilder()
+          .setData(ByteString.copyFrom(value.getData()))
+          .setEtag(Etag.newBuilder().setValue(value.getEtag()).build())
+          .build())
         // otherwise return an empty response
         .orElse(EMPTY_GET_RESPONSE);
 
@@ -124,13 +126,23 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
         // Let's convert all requested items into BulkStateItems objects.
         .map(requestedItem -> stateStore.get(requestedItem.getKey())
             // If value is present, convert it to an appropriate BulkStateItem object
-            .map(value -> BulkStateItem.newBuilder().setKey(requestedItem.getKey())
-                .setData(ByteString.copyFrom(value.getData()))
-                .setEtag(Etag.newBuilder().setValue(value.getEtag()).build()).setError(BulkGetError.NONE).build())
+            .map(value -> BulkStateItem.newBuilder()
+              .setKey(requestedItem.getKey())
+              .setData(ByteString.copyFrom(value.getData()))
+              .setEtag(Etag.newBuilder().setValue(value.getEtag()).build())
+              .setError(BulkGetError.NONE)
+              .build()
+            )
             // otherwise return an empty BulkStateItem with corresponding error codes
-            .orElse(
-                BulkStateItem.newBuilder().setKey(requestedItem.getKey()).setData(ByteString.EMPTY).setEtag(EMPTY_ETAG)
-                    .setError(BulkGetError.KEY_DOES_NOT_EXIST).build())).collect(Collectors.toUnmodifiableList());
+            .orElse(BulkStateItem.newBuilder()
+              .setKey(requestedItem.getKey())
+              .setData(ByteString.EMPTY)
+              .setEtag(EMPTY_ETAG)
+              .setError(BulkGetError.KEY_DOES_NOT_EXIST)
+              .build()
+            )
+        )
+        .collect(Collectors.toUnmodifiableList());
 
     final BulkGetResponse response = BulkGetResponse.newBuilder().addAllItems(items).build();
     responseObserver.onNext(response);
