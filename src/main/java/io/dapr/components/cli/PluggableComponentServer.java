@@ -84,7 +84,36 @@ public class PluggableComponentServer {
     server = buildUnixSocketServer(unixSocketPath, exposedService);
 
     start();
+    // Ensure unix domain file is accessible by outside daprd
+    fixFilePermissions(unixSocketPath);
     blockUntilShutdown();
+  }
+
+  /**
+   * Ensure the created Unix Socket file is world-readable and world-writable.
+   *
+   * <p>Since the user under with the component run might be different from the one
+   * used by `daprd`, the simplest way to unsure both can read and write to the same
+   * Unix Socket Domain file is making those files world readable and world writable.
+   * And that is what this method does.</p>
+   *
+   * <p>Another options is to set a `umask` value in the environment that runs this server.
+   * But this approach here seems simpler for the component developer and user.
+   * </p>
+   *
+   * <p>Make sure to call this method <b>after</b> the unix domain file has been created.
+   * doing so before will be meaningless and might produce a warning.
+   * </p>
+   *
+   * @param unixSocketPath the file path for the Unix Domain File we want to make world R/W'able.
+   */
+  private static void fixFilePermissions(String unixSocketPath) {
+    final File unixSocketFile = new File(unixSocketPath);
+    final boolean fixPermissions = unixSocketFile.setWritable(true, false)
+            && unixSocketFile.setReadable(true, false);
+    if (!fixPermissions) {
+      log.warning("Could not configure R/W permissions for unix socked domain file " + unixSocketPath);
+    }
   }
 
   private static Server buildUnixSocketServer(
@@ -98,7 +127,8 @@ public class PluggableComponentServer {
           + "Removing it to recreate it.");
       Files.deleteIfExists(unixSocketFile.toPath());
     }
-    // Regardless, delete this file on exist. Just good hygiene ;)
+
+    // Regardless, delete this file on exit. It's just good manners. ;)
     unixSocketFile.deleteOnExit();
 
     final DomainSocketAddress unixSocket = new DomainSocketAddress(unixSocketPath);

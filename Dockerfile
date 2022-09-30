@@ -58,16 +58,9 @@ RUN mkdir -vp /opt/
 ENV PROJECT_DIR=/opt/statestore-component
 COPY --from=build ${PROJECT_DIR} ${PROJECT_DIR}
 
-ENV PATH="/opt/statestore-component/build/install/DaprPluggableComponent-Java/bin/:${PATH}"
-
-# Copy umask wrapper. We need it to ensure the Unix Socket Domain created by
-# This container is readable and writable by the outside Dapr process
-
-COPY bin/umask_entrypoint_wrapper.sh /usr/local/bin
+ENV PATH="/opt/statestore-component/build/install/components-java-sdk/bin/:${PATH}"
 
 #
 # Run the service
 # 
-# Firsk, change umask to 000 so we create the unix file permissions with
-# write/read permissions to everyone.
-CMD ["umask_entrypoint_wrapper.sh", "state-store-component-server"]
+CMD ["state-store-component-server"]
