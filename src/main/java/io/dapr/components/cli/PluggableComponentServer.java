@@ -13,10 +13,8 @@
 
 package io.dapr.components.cli;
 
-import com.beust.jcommander.JCommander;
 import io.grpc.BindableService;
 import io.grpc.Server;
-import io.grpc.ServerBuilder;
 import io.grpc.netty.NettyServerBuilder;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollServerDomainSocketChannel;
@@ -45,6 +43,7 @@ import java.util.concurrent.TimeUnit;
 @Log
 @RequiredArgsConstructor
 public class PluggableComponentServer {
+  public static final String DAPR_SOCKET_PATH_ENVIRONMENT_VARIABLE = "DAPR_COMPONENT_SOCKET_PATH";
   /**
    * Nane of the current CLI program. This will be used for constructing our --help messages.
    */
@@ -76,32 +75,13 @@ public class PluggableComponentServer {
    * @throws InterruptedException Thrown if an error happened while running the service.
    */
   public void main(@NonNull final String[] args) throws IOException, InterruptedException {
-    // Command line parsing
-    final CommandLineOptions options = new CommandLineOptions();
-    final JCommander jCommander = JCommander.newBuilder()
-        .programName(programName)
-        .addObject(options)
-        .build();
-    jCommander.parse(args);
-    if (options.isHelp()) {
-      jCommander.usage();
-      System.exit(0);
-    }
-    // Either Unix Socket Domains or TCP, but not both
-    final Optional<String> maybeUnixSocketPath = options.getUnixSocketPathFromArgsOrEnv();
-    final Optional<Integer> maybeTcpPort = Optional.ofNullable(options.getTcpPort());
-    if (maybeUnixSocketPath.isPresent() == maybeTcpPort.isPresent()) {
-      System.err.println("ERROR: You must provide either a UNIX socket path or "
-          + "a TCP port - but not both.\n\n");
-      jCommander.usage();
-      System.exit(1);
-    }
-    final boolean isTcpServer = maybeTcpPort.isPresent();
+    // There is no command line parsing - the only thing this program expects
+    // is that env. var. referred by DAPR_SOCKET_PATH_ENVIRONMENT_VARIABLE is defined.
+    final String unixSocketPath = getUnixSocketPathFromEnvOrDie();
 
     // Start server
     log.info("Starting server for " + programName + "...");
-    server = isTcpServer ? setupTcpServer(maybeTcpPort.get(), exposedService)
-        : buildUnixSocketServer(maybeUnixSocketPath.get(), exposedService);
+    server = buildUnixSocketServer(unixSocketPath, exposedService);
 
     start();
     blockUntilShutdown();
@@ -132,13 +112,6 @@ public class PluggableComponentServer {
         .build();
   }
 
-  private static Server setupTcpServer(int port, @NonNull final BindableService exposedService) {
-    log.info("Configuring server to listen on TCP port " + port);
-    return ServerBuilder.forPort(port)
-        .addService(exposedService)
-        .build();
-  }
-
   private void start() throws IOException {
     server.start();
     log.info("Server started.");
@@ -165,4 +138,25 @@ public class PluggableComponentServer {
     server.awaitTermination();
   }
 
+  /** Retrieves the path for Unix Socket Path or exit the program with an error status.
+   *
+   * <P>This path is read from the DAPR_COMPONENT_SOCKET_PATH environment variable, if that is defined.
+   *
+   * @return the path pointed by env. var. DAPR_COMPONENT_SOCKET_PATH.
+   */
+  public String getUnixSocketPathFromEnvOrDie() {
+    log.info("Retrieving unix socket domain path from env. var. " + DAPR_SOCKET_PATH_ENVIRONMENT_VARIABLE);
+    final Optional<String> maybeUnixSocketPath = Optional.ofNullable(
+            System.getenv(PluggableComponentServer.DAPR_SOCKET_PATH_ENVIRONMENT_VARIABLE));
+    if (!maybeUnixSocketPath.isPresent()) {
+      System.err.println("ERROR: You MUST provide a UNIX socket path using env. var. "
+              + DAPR_SOCKET_PATH_ENVIRONMENT_VARIABLE);
+      System.exit(1);
+      // code ends here! no return
+    } else {
+      log.info(DAPR_SOCKET_PATH_ENVIRONMENT_VARIABLE + "=" + maybeUnixSocketPath.get());
+    }
+
+    return maybeUnixSocketPath.get();
+  }
 }
