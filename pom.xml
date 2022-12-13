@@ -25,62 +25,54 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <!-- TODO add distributionManagement -->
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>io.dapr</groupId>
-                <artifactId>dapr-sdk</artifactId>
-                <version>1.7.1</version>
-            </dependency>
+    <dependencies>
+        <dependency>
+            <groupId>io.dapr</groupId>
+            <artifactId>dapr-sdk</artifactId>
+            <version>1.7.1</version>
+        </dependency>
 
-            <!-- ProtocolBuffers and gRPC dependencies -->
+        <!-- ProtocolBuffers and gRPC dependencies -->
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java-util</artifactId>
+            <version>${protobuf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-bom</artifactId>
+            <version>${grpc.version}</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-protobuf</artifactId>
+            <version>${grpc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-stub</artifactId>
+            <version>${grpc.version}</version>
+        </dependency>
 
-            <dependency>
-                <groupId>com.google.protobuf</groupId>
-                <artifactId>protobuf-java-util</artifactId>
-                <version>${protobuf.version}</version>
-            </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty</artifactId>
+            <version>${grpc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-netty-shaded</artifactId>
+            <version>${grpc.version}</version>
+        </dependency>
 
-            <dependency>
-                <groupId>io.grpc</groupId>
-                <artifactId>grpc-bom</artifactId>
-                <version>${grpc.version}</version>
-                <type>pom</type>
-            </dependency>
-            <dependency>
-                <groupId>io.grpc</groupId>
-                <artifactId>grpc-protobuf</artifactId>
-                <version>${grpc.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.grpc</groupId>
-                <artifactId>grpc-stub</artifactId>
-                <version>${grpc.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.grpc</groupId>
-                <artifactId>grpc-netty</artifactId>
-                <version>${grpc.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.grpc</groupId>
-                <artifactId>grpc-netty-shaded</artifactId>
-                <version>${grpc.version}</version>
-            </dependency>
-
-
-
-
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter</artifactId>
-                <version>5.7.2</version>
-                <scope>test</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.7.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
@@ -144,27 +136,29 @@
     </build>
 
     <!-- TODO add reporting section -->
+
+    <!-- TODO add distributionManagement -->
     
     <licenses>
         <license>
-          <name>Apache License Version 2.0</name>
-          <url>https://opensource.org/licenses/Apache-2.0</url>
+            <name>Apache License Version 2.0</name>
+            <url>https://opensource.org/licenses/Apache-2.0</url>
         </license>
-      </licenses>
+    </licenses>
     
-      <developers>
+    <developers>
         <developer>
-          <name>Dapr</name>
-          <email>daprweb@microsoft.com</email>
-          <organization>Dapr</organization>
-          <organizationUrl>https://dapr.io</organizationUrl>
+            <name>Dapr</name>
+            <email>daprweb@microsoft.com</email>
+            <organization>Dapr</organization>
+            <organizationUrl>https://dapr.io</organizationUrl>
         </developer>
-      </developers>
+    </developers>
     
-      <scm>
-          <url>https://github.com/dapr-sandbox/components-go-sdk</url>
-          <connection>scm:git:https://github.com/dapr-sandbox/components-go-sdk.git</connection>
-          <tag>HEAD</tag>
-      </scm>
+    <scm>
+        <url>https://github.com/dapr-sandbox/components-go-sdk</url>
+        <connection>scm:git:https://github.com/dapr-sandbox/components-go-sdk.git</connection>
+        <tag>HEAD</tag>
+    </scm>
     
 </project>

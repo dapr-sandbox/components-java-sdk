@@ -13,16 +13,11 @@
 
 package org.example;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
-
 import java.io.IOException;
 
 /**
  * A bare-bones server exposing a StateStore GRPC implementation.
  */
-@Log
-@RequiredArgsConstructor
 public class StateStoreComponentServer {
 
   /** Start our StateStoreComponentServer.
