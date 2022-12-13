@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.dapr</groupId>
+        <artifactId>components-java-sdk-parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>components-java-sdk-autogen</artifactId>
+    <packaging>jar</packaging>
+    <name>components-java-sdk-autogen</name>
+    <description>Auto-generated classes from .proto definitions for use with Dapr Pluggable Components</description>
+
+    <properties>
+        <protobuf.output.directory>${project.build.directory}/generated-sources</protobuf.output.directory>
+
+        <protobuf.input.directory>${project.build.directory}/protobuf</protobuf.input.directory>
+        <protobuf.input.directory.common>${protobuf.input.directory}/dapr/proto/common/v1</protobuf.input.directory.common>
+        <protobuf.input.directory.components>${protobuf.input.directory}/dapr/proto/components/v1/</protobuf.input.directory.components>
+        
+        <maven.deploy.skip>false</maven.deploy.skip>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <version>1.3.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- We avoid dupplicating GRPC and Protocol Buffer dependencies -->
+        <!-- here as they were already defined project-wise. -->
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Download .protos -->
+            <plugin>
+                <groupId>com.googlecode.maven-download-plugin</groupId>
+                <artifactId>download-maven-plugin</artifactId>
+                <version>1.6.8</version>
+                <executions>
+                    <!-- commons.proto -->
+                    <execution>
+                        <id>getCommonProto</id>
+                        <!-- the wget goal actually binds itself to this phase by default -->
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>${dapr.proto.baseurl}/common/v1/common.protoX</url>
+                            <outputDirectory>${protobuf.input.directory.common}</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <!-- components/common -->
+                    <execution>
+                        <id>getComponentsCommoProto</id>
+                        <!-- the wget goal actually binds itself to this phase by default -->
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>${dapr.proto.baseurl}/components/v1/common.proto</url>
+                            <outputDirectory>${protobuf.input.directory.components}</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <!-- components/stateStore -->
+                    <execution>
+                        <id>getComponentsStateStoreProto</id>
+                        <!-- the wget goal actually binds itself to this phase by default -->
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>${dapr.proto.baseurl}/components/v1/state.proto</url>
+                            <outputDirectory>${protobuf.input.directory.components}</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Generate sources from downloaded protos -->
+            <plugin>
+                <groupId>com.github.os72</groupId>
+                <artifactId>protoc-jar-maven-plugin</artifactId>
+                <version>3.11.4</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <protocVersion>${protobuf.version}</protocVersion>
+                            <addProtoSources>inputs</addProtoSources>
+                            <includeMavenTypes>direct</includeMavenTypes>
+                            <includeStdTypes>true</includeStdTypes>
+                            <!-- This is not a typo: we have to set include and input directories -->
+                            <inputDirectories>
+                                <include>${protobuf.input.directory}</include>
+                            </inputDirectories>
+                            <includeDirectories>
+                                <include>${protobuf.input.directory}</include>
+                            </includeDirectories>
+                            <outputTargets>
+                                <outputTarget>
+                                    <type>java</type>
+                                    <outputDirectory>${protobuf.output.directory}</outputDirectory>
+                                </outputTarget>
+                                <outputTarget>
+                                    <type>grpc-java</type>
+                                    <outputDirectory>${protobuf.output.directory}</outputDirectory>
+                                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}</pluginArtifact>
+                                </outputTarget>
+                            </outputTargets>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <configuration>
+                    <!-- Skip findbugs for auto-generated code -->
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
