@@ -156,8 +156,8 @@
     </developers>
     
     <scm>
-        <url>https://github.com/dapr-sandbox/components-go-sdk</url>
-        <connection>scm:git:https://github.com/dapr-sandbox/components-go-sdk.git</connection>
+        <url>https://github.com/dapr-sandbox/components-java-sdk</url>
+        <connection>scm:git:https://github.com/dapr-sandbox/components-java-sdk.git</connection>
         <tag>HEAD</tag>
     </scm>
     
