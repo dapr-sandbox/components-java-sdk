@@ -12,7 +12,13 @@
     <description>Java SDK for Dapr Pluggable Components.</description>
     <url>https://dapr.io</url>
 
+    <modules>
+        <module>components-java-sdk-autogen</module>
+    </modules>
+
     <properties>
+        <dapr.proto.baseurl>https://raw.githubusercontent.com/dapr/dapr/v1.9.5/dapr/proto</dapr.proto.baseurl>
+        <!-- Pin library dependencies to specific versions-->
         <grpc.version>1.42.1</grpc.version>
         <protobuf.version>3.17.3</protobuf.version>
         <springboot.version>2.3.5.RELEASE</springboot.version>
@@ -20,6 +26,7 @@
         <spotbugs.version>4.0.0-RC1</spotbugs.version>
         <spotbugs.fail>true</spotbugs.fail>
 
+        <!-- Project-wise language settings -->
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
