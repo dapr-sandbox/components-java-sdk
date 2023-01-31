@@ -13,6 +13,8 @@
 
 package io.dapr.components.domain.state;
 
+import com.google.protobuf.ByteString;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -27,8 +29,29 @@ import java.util.Objects;
  * @param options The Set request options.
  * @param contentType The value contenttype.
  */
-public record SetRequest(String key, byte[] value, String etag, Map<String, String> metadata, StateOptions options,
+public record SetRequest(String key, ByteString value, String etag, Map<String, String> metadata, StateOptions options,
                          String contentType) {
+  /**
+   * Canonical Constructor.
+   *
+   * @param key The key that should be set.
+   * @param value Value is the desired content of the given key.
+   * @param etag The etag is used as a If-Match header, to allow certain levels of consistency.
+   * @param metadata The request metadata.
+   * @param options The Set request options.
+   * @param contentType The value contenttype.
+   */
+  public SetRequest(String key, ByteString value, String etag, Map<String, String> metadata, StateOptions options,
+                    String contentType) {
+    this.key = Objects.requireNonNull(key);
+    this.value = Objects.requireNonNull(value);
+    this.etag = Objects.requireNonNull(etag);
+    // All this constructor just so we can make this Map unmodifiable and this class immutable ;)
+    this.metadata = Collections.unmodifiableMap(Objects.requireNonNull(metadata));
+    this.options = Objects.requireNonNull(options);
+    this.contentType = Objects.requireNonNull(contentType);
+  }
+
   /**
    * Constructor.
    *
@@ -41,13 +64,13 @@ public record SetRequest(String key, byte[] value, String etag, Map<String, Stri
    */
   public SetRequest(String key, byte[] value, String etag, Map<String, String> metadata, StateOptions options,
                     String contentType) {
-    this.key = Objects.requireNonNull(key);
-    this.value = Objects.requireNonNull(value);
-    this.etag = Objects.requireNonNull(etag);
-    // All this constructor just so we can make this Map unmodifiable and this class immutable ;)
-    this.metadata = Collections.unmodifiableMap(Objects.requireNonNull(metadata));
-    this.options = Objects.requireNonNull(options);
-    this.contentType = Objects.requireNonNull(contentType);
+    this(Objects.requireNonNull(key),
+        ByteString.copyFrom(Objects.requireNonNull(value)),
+        Objects.requireNonNull(etag),
+        // All this constructor just so we can make this Map unmodifiable and this class immutable ;)
+        Objects.requireNonNull(metadata),
+        Objects.requireNonNull(options),
+        Objects.requireNonNull(contentType));
   }
 
   /**
@@ -57,7 +80,7 @@ public record SetRequest(String key, byte[] value, String etag, Map<String, Stri
    */
   public SetRequest(dapr.proto.components.v1.State.SetRequest other) {
     this(other.getKey(),
-        other.getValue().toByteArray(),
+        other.getValue(),
         other.getEtag().getValue(),
         other.getMetadataMap(),
         new StateOptions(other.getOptions()),

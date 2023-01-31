@@ -24,5 +24,5 @@ public interface StateStore extends InitializableWithProperties, AdvertisesFeatu
 
   Mono<Void> delete(DeleteRequest deleteRequest);
 
-  Mono<Void> set(SetRequest setRequeset);
+  Mono<Void> set(SetRequest setRequest);
 }

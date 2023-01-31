@@ -11,14 +11,11 @@
  * limitations under the License.
  */
 
-package io.dapr.components.aspects;
+package io.dapr.components.domain.state;
 
-import reactor.core.publisher.Mono;
-
-import java.util.Map;
-
-public interface InitializableWithProperties {
-  default Mono<Void> init(Map<String, String> properties) {
-    return Mono.empty();
-  }
+public class Constants {
+  /**
+   * Default content type when one is not presented by the user.
+   */
+  public static final String DEFAULT_CONTENT_TYPE = "application/octet-stream";
 }

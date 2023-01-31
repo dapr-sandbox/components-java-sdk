@@ -16,5 +16,7 @@ package io.dapr.components.aspects;
 import reactor.core.publisher.Mono;
 
 public interface Pingable {
-  Mono<Void> ping();
+  default Mono<Void> ping() {
+    return Mono.empty();
+  }
 }
