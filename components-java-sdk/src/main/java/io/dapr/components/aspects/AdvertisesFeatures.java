@@ -15,8 +15,11 @@ package io.dapr.components.aspects;
 
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.util.List;
 
 public interface AdvertisesFeatures {
-  Mono<List<String>> getFeatures();
+  default Mono<List<String>> getFeatures() {
+    return Mono.just(Collections.emptyList());
+  }
 }

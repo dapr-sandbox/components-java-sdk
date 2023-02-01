@@ -13,8 +13,6 @@
 
 package io.dapr.components.domain.state;
 
-import dapr.proto.components.v1.State;
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;

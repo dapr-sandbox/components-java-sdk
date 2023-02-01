@@ -102,9 +102,13 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
         .map(io.dapr.components.domain.state.GetRequest::new) // Convert to local domain/model
         .flatMap(stateStore::get)
         // If value is present, map it to an appropriate GetResponse object
-        .map(value -> State.GetResponse.newBuilder()
-          .setData(ByteString.copyFrom(value.data()))
-          .setEtag(Etag.newBuilder().setValue(value.etag()).build())
+        .map(response -> State.GetResponse.newBuilder()
+            .setData(response.data())
+            .setEtag(Etag.newBuilder()
+                .setValue(response.etag())
+                .build())
+            .putAllMetadata(response.metadata())
+            .setContentType(response.contentType())
           .build())
         // otherwise return an empty response
         .defaultIfEmpty(EMPTY_GET_RESPONSE)
@@ -121,7 +125,7 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
             // If value is present, convert it to an appropriate BulkStateItem object
             .map(value -> BulkStateItem.newBuilder()
                 .setKey(requestedItem.key())
-                .setData(ByteString.copyFrom(value.data()))
+                .setData(value.data())
                 .setEtag(Etag.newBuilder()
                     .setValue(value.etag())
                     .build())

@@ -24,7 +24,7 @@
         <protobuf.version>3.17.3</protobuf.version>
         <springboot.version>2.3.5.RELEASE</springboot.version>
 
-        <spotbugs.version>4.0.0-RC1</spotbugs.version>
+        <spotbugs.version>4.7.3.0</spotbugs.version>
         <spotbugs.fail>true</spotbugs.fail>
 
         <!-- Project-wise language settings -->
@@ -117,18 +117,11 @@
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>4.1.4</version>
-                <dependencies>
-                    <!-- overwrite dependency on spotbugs if you want to specify the version of spotbugs -->
-                    <dependency>
-                        <groupId>com.github.spotbugs</groupId>
-                        <artifactId>spotbugs</artifactId>
-                        <version>${spotbugs.version}</version>
-                    </dependency>
-                </dependencies>
+                <version>${spotbugs.version}</version>
                 <configuration>
                     <failOnError>${spotbugs.fail}</failOnError>
                     <xmlOutput>true</xmlOutput>
+                    <excludeFilterFile>spotbugs-exclude.xml</excludeFilterFile>
                 </configuration>
                 <executions>
                     <execution>
