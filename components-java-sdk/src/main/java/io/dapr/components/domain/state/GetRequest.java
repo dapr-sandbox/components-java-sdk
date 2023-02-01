@@ -13,7 +13,6 @@
 
 package io.dapr.components.domain.state;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
@@ -35,7 +34,7 @@ public record GetRequest(String key, Map<String, String> metadata, StateOptions.
    */
   public GetRequest(String key, Map<String, String> metadata, StateOptions.StateConsistency consistency) {
     this.key = Objects.requireNonNull(key);
-    this.metadata = Collections.unmodifiableMap(Objects.requireNonNull(metadata));
+    this.metadata = Map.copyOf(Objects.requireNonNull(metadata));
     this.consistency = Objects.requireNonNull(consistency);
   }
 

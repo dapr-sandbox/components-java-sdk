@@ -46,7 +46,7 @@ public record GetResponse(ByteString data, String etag, Map<String, String> meta
     this.data = Objects.requireNonNull(data);
     this.etag = Objects.requireNonNull(etag);
     // All this constructor just so we can make this Map unmodifiable and this class immutable ;)
-    this.metadata = Collections.unmodifiableMap(Objects.requireNonNull(metadata));
+    this.metadata = Map.copyOf(Objects.requireNonNull(metadata));
     this.contentType = Objects.requireNonNull(contentType);
   }
 

@@ -5,17 +5,26 @@
         xsi:schemaLocation="https://github.com/spotbugs/filter/3.0.0 https://raw.githubusercontent.com/spotbugs/spotbugs/3.1.0/spotbugs/etc/findbugsfilter.xsd">
     <Match>
         <Or>
-            <!-- we are using ByteString as a immutable byte array. This is a false positive. -->
+            <!-- We are using Map.copyOf and Lists.copyOf to create immutable copies of lists and maps. Sorry
+                 SpotBugs but you are missing the point here.
+                 See https://github.com/spotbugs/spotbugs/pull/2141
+             -->
             <Class name="io.dapr.components.domain.state.GetResponse" />
             <Class name="io.dapr.components.domain.state.SetRequest" />
+            <Class name="io.dapr.components.domain.state.QueryRequest" />
+            <Class name="io.dapr.components.domain.state.TransactionalStateRequest" />
 
             <!-- StateStore wrapper has to be stored internally  -->
             <Class name="io.dapr.components.wrappers.StateStoreGrpcComponentWrapper" />
         </Or>
         <Or>
-            <Bug pattern="EI_EXPOSE_REP" />
-            <Bug pattern="EI_EXPOSE_REP2" />
+            <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2" />
         </Or>
+    </Match>
 
+    <Match>
+        <!-- we are using ByteString as am immutable byte array. This is a false positive. -->
+        <Field type="com.google.protobuf.ByteString"/>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2" />
     </Match>
 </FindBugsFilter>

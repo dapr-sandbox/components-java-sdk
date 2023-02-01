@@ -15,7 +15,6 @@ package io.dapr.components.domain.state;
 
 import com.google.protobuf.ByteString;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
@@ -28,9 +27,16 @@ import java.util.Objects;
  * @param metadata The request metadata.
  * @param options The Set request options.
  * @param contentType The value contenttype.
+ *
+ * {@see TransactionableOperation}
  */
-public record SetRequest(String key, ByteString value, String etag, Map<String, String> metadata, StateOptions options,
-                         String contentType) {
+public record SetRequest(
+    String key,
+    ByteString value,
+    String etag,
+    Map<String, String> metadata,
+    StateOptions options,
+    String contentType) implements TransactionableOperation {
   /**
    * Canonical Constructor.
    *
@@ -47,7 +53,7 @@ public record SetRequest(String key, ByteString value, String etag, Map<String, 
     this.value = Objects.requireNonNull(value);
     this.etag = Objects.requireNonNull(etag);
     // All this constructor just so we can make this Map unmodifiable and this class immutable ;)
-    this.metadata = Collections.unmodifiableMap(Objects.requireNonNull(metadata));
+    this.metadata = Map.copyOf(Objects.requireNonNull(metadata));
     this.options = Objects.requireNonNull(options);
     this.contentType = Objects.requireNonNull(contentType);
   }

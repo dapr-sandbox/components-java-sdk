@@ -24,8 +24,14 @@ import java.util.Objects;
  * @param etag The etag is used as a If-Match header, to allow certain levels of consistency.
  * @param metadata The request metadata.
  * @param options Consistency and concurrency options.
+ *
+ * {@see TransactionableOperation}
  */
-public record DeleteRequest(String key, String etag, Map<String, String> metadata, StateOptions options) {
+public record DeleteRequest(
+    String key,
+    String etag,
+    Map<String, String> metadata,
+    StateOptions options) implements TransactionableOperation {
 
   /**
    * Constructor.
@@ -39,7 +45,7 @@ public record DeleteRequest(String key, String etag, Map<String, String> metadat
     this.key = Objects.requireNonNull(key);
     this.etag = Objects.requireNonNull(etag);
     // All this constructor just so we can make this Map unmodifiable and this class immutable ;)
-    this.metadata = Collections.unmodifiableMap(Objects.requireNonNull(metadata));
+    this.metadata = Map.copyOf(Objects.requireNonNull(metadata));
     this.options = Objects.requireNonNull(options);
   }
 
