@@ -25,4 +25,16 @@ import com.google.protobuf.ByteString;
  * @param contentType  The returned content-type.
  */
 public record QueryItem(String key, ByteString data, String etag, String error, String contentType) {
+  /**
+   * Alternative constructor.
+   *
+   * @param key The returned item Key.
+   * @param data The returned item Data.
+   * @param etag The returned item ETag.
+   * @param error The returned error string.
+   * @param contentType  The returned content-type.
+   */
+  public QueryItem(String key, final byte[] data, String etag, String error, String contentType) {
+    this(key, ByteString.copyFrom(data), etag, error, contentType);
+  }
 }

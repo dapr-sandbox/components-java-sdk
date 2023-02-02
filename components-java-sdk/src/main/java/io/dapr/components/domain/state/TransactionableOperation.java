@@ -18,6 +18,14 @@ package io.dapr.components.domain.state;
  *
  * <p>This interface is being used as a type-safe alternative to representing the enum/oneof
  * used by {@link dapr.proto.components.v1.State.TransactionalStateOperation}</p>
+ * <p>Notice that there are only 2 operations that can be used in a
+ * {@link TransactionalStateRequest}:
+ * <ul>
+ *   <li>{@link DeleteRequest}</li>
+ *   <li>{@link SetRequest}</li>
+ * </ul>
+ * </p>
+ * <p>Besides those two operations above, no other operation should implement this interface.</p>
  */
 public interface TransactionableOperation {
 }

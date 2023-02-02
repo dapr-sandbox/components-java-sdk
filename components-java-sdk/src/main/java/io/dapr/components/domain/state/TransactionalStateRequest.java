@@ -16,6 +16,7 @@ package io.dapr.components.domain.state;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 public record TransactionalStateRequest(List<TransactionableOperation> operations, Map<String, String> metadata) {
 
@@ -23,5 +24,27 @@ public record TransactionalStateRequest(List<TransactionableOperation> operation
                                    final Map<String, String> metadata) {
     this.operations = List.copyOf(Objects.requireNonNull(operations));
     this.metadata = Map.copyOf(Objects.requireNonNull(metadata));
+  }
+
+  /**
+   * Iterates over each item in the operations list invoking the appropriate visitor
+   * in the same order those operations are found in the list.
+   *
+   * @param deleteVisitor Visitor that will be invoked for delete requests in the list.
+   * @param setVisitor  Visitor that will be invoked for delete requests in the operations
+   *                    list.
+   */
+  public void forEachOperation(Consumer<DeleteRequest> deleteVisitor,
+                               Consumer<SetRequest> setVisitor) {
+    for (var operation : this.operations()) {
+      if (operation instanceof DeleteRequest deleteRequest) {
+        deleteVisitor.accept(deleteRequest);
+      } else if (operation instanceof SetRequest setRequest) {
+        setVisitor.accept(setRequest);
+      } else {
+        throw new UnsupportedOperationException("The provided operation of type "
+            + operation.getClass().toString() + " is not a valid TransactionableOperation");
+      }
+    }
   }
 }
