@@ -24,7 +24,7 @@ import com.google.protobuf.ByteString;
  * @param error The returned error string.
  * @param contentType  The returned content-type.
  */
-public record QueryItem(String key, ByteString data, String etag, String error, String contentType) {
+public record QueryResponseItem(String key, ByteString data, String etag, String error, String contentType) {
   /**
    * Alternative constructor.
    *
@@ -34,7 +34,7 @@ public record QueryItem(String key, ByteString data, String etag, String error, 
    * @param error The returned error string.
    * @param contentType  The returned content-type.
    */
-  public QueryItem(String key, final byte[] data, String etag, String error, String contentType) {
+  public QueryResponseItem(String key, final byte[] data, String etag, String error, String contentType) {
     this(key, ByteString.copyFrom(data), etag, error, contentType);
   }
 }

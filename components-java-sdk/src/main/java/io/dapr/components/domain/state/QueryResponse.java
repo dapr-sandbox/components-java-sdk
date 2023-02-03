@@ -24,7 +24,7 @@ import java.util.Objects;
  * @param token The response token.
  * @param metadata Response associated metadata.
  */
-public record QueryResponse(List<QueryItem> items, String token, Map<String, String> metadata) {
+public record QueryResponse(List<QueryResponseItem> items, String token, Map<String, String> metadata) {
   /**
    * Canonical constructor.
    *
@@ -32,7 +32,7 @@ public record QueryResponse(List<QueryItem> items, String token, Map<String, Str
    * @param token The response token.
    * @param metadata Response associated metadata.
    */
-  public QueryResponse(List<QueryItem> items, String token, Map<String, String> metadata) {
+  public QueryResponse(List<QueryResponseItem> items, String token, Map<String, String> metadata) {
     this.items = List.copyOf(Objects.requireNonNull(items));
     this.token = Objects.requireNonNull(token);
     this.metadata = Map.copyOf(Objects.requireNonNull(metadata));

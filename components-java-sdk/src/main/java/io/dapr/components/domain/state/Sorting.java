@@ -13,12 +13,7 @@
 
 package io.dapr.components.domain.state;
 
-import dapr.proto.components.v1.State;
-
-import java.util.Arrays;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import io.dapr.components.domain.state.options.Order;
 
 /**
  * Describes a sorting order to be performed by a Query.
@@ -28,27 +23,4 @@ import java.util.stream.Collectors;
  */
 public record Sorting(String key, Order order) {
 
-  enum Order {
-    ASC(dapr.proto.components.v1.State.Sorting.Order.ASC),
-    DESC(dapr.proto.components.v1.State.Sorting.Order.DESC);
-
-    private final dapr.proto.components.v1.State.Sorting.Order equivalent;
-
-    Order(dapr.proto.components.v1.State.Sorting.Order equivalent) {
-      this.equivalent = equivalent;
-    }
-
-    // Convert Protocol Buffer model to this SDK internal Model
-    static final Map<dapr.proto.components.v1.State.Sorting.Order, Sorting.Order> toSdkModel =
-        Arrays.stream(Sorting.Order.values())
-            .collect(Collectors.toMap(Sorting.Order::getValue, Function.identity()));
-
-    public State.Sorting.Order getValue() {
-      return equivalent;
-    }
-
-    public static Sorting.Order of(dapr.proto.components.v1.State.Sorting.Order value) {
-      return toSdkModel.get(value);
-    }
-  }
 }
