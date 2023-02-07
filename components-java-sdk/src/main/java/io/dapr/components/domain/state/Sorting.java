@@ -13,21 +13,14 @@
 
 package io.dapr.components.domain.state;
 
-import dapr.proto.components.v1.State;
-import io.dapr.components.domain.state.options.StateConcurrency;
-import io.dapr.components.domain.state.options.StateConsistency;
+import io.dapr.components.domain.state.options.Order;
 
-import java.util.Objects;
+/**
+ * Describes a sorting order to be performed by a Query.
+ *
+ * @param key The key that should be used for sorting.
+ * @param order The order that should be used.
+ */
+public record Sorting(String key, Order order) {
 
-public record StateOptions(StateConcurrency concurrency, StateConsistency consistency) {
-
-  public StateOptions {
-    Objects.requireNonNull(concurrency);
-    Objects.requireNonNull(consistency);
-  }
-
-  public StateOptions(State.StateOptions other) {
-    this(StateConcurrency.fromValue(other.getConcurrency()),
-        StateConsistency.fromValue(other.getConsistency()));
-  }
 }

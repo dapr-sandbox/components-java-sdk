@@ -13,21 +13,19 @@
 
 package io.dapr.components.domain.state;
 
-import dapr.proto.components.v1.State;
-import io.dapr.components.domain.state.options.StateConcurrency;
-import io.dapr.components.domain.state.options.StateConsistency;
-
-import java.util.Objects;
-
-public record StateOptions(StateConcurrency concurrency, StateConsistency consistency) {
-
-  public StateOptions {
-    Objects.requireNonNull(concurrency);
-    Objects.requireNonNull(consistency);
-  }
-
-  public StateOptions(State.StateOptions other) {
-    this(StateConcurrency.fromValue(other.getConcurrency()),
-        StateConsistency.fromValue(other.getConsistency()));
-  }
+/**
+ * This interface act as a marker for operations that can be used with Transactions.
+ *
+ * <p>This interface is being used as a type-safe alternative to representing the enum/oneof
+ * used by {@link dapr.proto.components.v1.State.TransactionalStateOperation}</p>
+ * <p>Notice that there are only 2 operations that can be used in a
+ * {@link TransactionalStateRequest}:
+ * <ul>
+ *   <li>{@link DeleteRequest}</li>
+ *   <li>{@link SetRequest}</li>
+ * </ul>
+ * </p>
+ * <p>Besides those two operations above, no other operation should implement this interface.</p>
+ */
+public interface TransactionableOperation {
 }

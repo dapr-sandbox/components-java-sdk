@@ -13,21 +13,24 @@
 
 package io.dapr.components.domain.state;
 
-import dapr.proto.components.v1.State;
-import io.dapr.components.domain.state.options.StateConcurrency;
-import io.dapr.components.domain.state.options.StateConsistency;
-
+import java.util.Map;
 import java.util.Objects;
 
-public record StateOptions(StateConcurrency concurrency, StateConsistency consistency) {
-
-  public StateOptions {
-    Objects.requireNonNull(concurrency);
-    Objects.requireNonNull(consistency);
-  }
-
-  public StateOptions(State.StateOptions other) {
-    this(StateConcurrency.fromValue(other.getConcurrency()),
-        StateConsistency.fromValue(other.getConsistency()));
+/**
+ * QueryRequest is for querying state store.
+ *
+ * @param query The query to be performed.
+ * @param metadata Request associated metadata.
+ */
+public record QueryRequest(Query query, Map<String,String> metadata) {
+  /**
+   * Canonical constructor.
+   *
+   * @param query The query to be performed.
+   * @param metadata Request associated metadata.
+   */
+  public QueryRequest(final Query query, final Map<String, String> metadata) {
+    this.query = Objects.requireNonNull(query);
+    this.metadata = Objects.requireNonNull(metadata);
   }
 }

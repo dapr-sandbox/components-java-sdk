@@ -13,21 +13,11 @@
 
 package io.dapr.components.domain.state;
 
-import dapr.proto.components.v1.State;
-import io.dapr.components.domain.state.options.StateConcurrency;
-import io.dapr.components.domain.state.options.StateConsistency;
-
-import java.util.Objects;
-
-public record StateOptions(StateConcurrency concurrency, StateConsistency consistency) {
-
-  public StateOptions {
-    Objects.requireNonNull(concurrency);
-    Objects.requireNonNull(consistency);
-  }
-
-  public StateOptions(State.StateOptions other) {
-    this(StateConcurrency.fromValue(other.getConcurrency()),
-        StateConsistency.fromValue(other.getConsistency()));
-  }
+/**
+ * Representation of pagination parameters.
+ *
+ * @param limit Maximum of results that should be returned.
+ * @param token The pagination token.
+ */
+public record Pagination(int limit, String token) {
 }

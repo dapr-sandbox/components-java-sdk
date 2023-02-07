@@ -14,20 +14,19 @@
 package io.dapr.components.domain.state;
 
 import dapr.proto.components.v1.State;
-import io.dapr.components.domain.state.options.StateConcurrency;
-import io.dapr.components.domain.state.options.StateConsistency;
+import reactor.core.publisher.Mono;
 
-import java.util.Objects;
-
-public record StateOptions(StateConcurrency concurrency, StateConsistency consistency) {
-
-  public StateOptions {
-    Objects.requireNonNull(concurrency);
-    Objects.requireNonNull(consistency);
-  }
-
-  public StateOptions(State.StateOptions other) {
-    this(StateConcurrency.fromValue(other.getConcurrency()),
-        StateConsistency.fromValue(other.getConsistency()));
-  }
+/**
+ * QueriableStateStore service provides a gRPC interface for querier state store
+ * components. It was designed to embed query features to the StateStore Service
+ * as a complementary service.
+ */
+public interface QueriableStateStore  {
+  /**
+   * Query performs a query request on the statestore..
+   *
+   * @param request the query.
+   * @return A reponse encapsulated in a QueryReponse object.
+   */
+  Mono<QueryResponse> query(QueryRequest request);
 }

@@ -13,7 +13,8 @@
 
 package io.dapr.components.domain.state;
 
-import java.util.Collections;
+import io.dapr.components.domain.state.options.StateConsistency;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -24,7 +25,7 @@ import java.util.Objects;
  * @param metadata Request associated metadata.
  * @param consistency The get consistency level.
  */
-public record GetRequest(String key, Map<String, String> metadata, StateOptions.StateConsistency consistency) {
+public record GetRequest(String key, Map<String, String> metadata, StateConsistency consistency) {
 
   /**
    * Constructor.
@@ -33,9 +34,9 @@ public record GetRequest(String key, Map<String, String> metadata, StateOptions.
    * @param metadata Request associated metadata.
    * @param consistency The get consistency level.
    */
-  public GetRequest(String key, Map<String, String> metadata, StateOptions.StateConsistency consistency) {
+  public GetRequest(String key, Map<String, String> metadata, StateConsistency consistency) {
     this.key = Objects.requireNonNull(key);
-    this.metadata = Collections.unmodifiableMap(Objects.requireNonNull(metadata));
+    this.metadata = Map.copyOf(Objects.requireNonNull(metadata));
     this.consistency = Objects.requireNonNull(consistency);
   }
 
@@ -47,6 +48,6 @@ public record GetRequest(String key, Map<String, String> metadata, StateOptions.
   public GetRequest(dapr.proto.components.v1.State.GetRequest other) {
     this(other.getKey(),
         other.getMetadataMap(),
-        StateOptions.StateConsistency.of(other.getConsistency()));
+        StateConsistency.fromValue(other.getConsistency()));
   }
 }

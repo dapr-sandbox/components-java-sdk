@@ -13,21 +13,19 @@
 
 package io.dapr.components.domain.state;
 
-import dapr.proto.components.v1.State;
-import io.dapr.components.domain.state.options.StateConcurrency;
-import io.dapr.components.domain.state.options.StateConsistency;
+import reactor.core.publisher.Mono;
 
-import java.util.Objects;
-
-public record StateOptions(StateConcurrency concurrency, StateConsistency consistency) {
-
-  public StateOptions {
-    Objects.requireNonNull(concurrency);
-    Objects.requireNonNull(consistency);
-  }
-
-  public StateOptions(State.StateOptions other) {
-    this(StateConcurrency.fromValue(other.getConcurrency()),
-        StateConsistency.fromValue(other.getConsistency()));
-  }
+/**
+ * TransactionalStateStore service provides a gRPC interface for transactional
+ * state store components. It was designed to embed transactional features to
+ * the StateStore Service as a complementary service.
+ */
+public interface TransactionalStateStore {
+  /**
+   * Transact executes multiples operation in a transactional environment.
+   *
+   * @param request The transactional request.
+   * @return A Mono representing the success (or failure) of the operation.
+   */
+  Mono<Void> transact(TransactionalStateRequest request);
 }
