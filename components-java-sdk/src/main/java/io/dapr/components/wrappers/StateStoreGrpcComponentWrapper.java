@@ -30,7 +30,6 @@ import io.dapr.components.domain.state.StateStore;
 import io.dapr.v1.ComponentProtos;
 import io.dapr.v1.ComponentProtos.FeaturesResponse;
 import io.grpc.stub.StreamObserver;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
@@ -45,11 +44,13 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
       .setEtag(EMPTY_ETAG)
       .build();
 
-  /**
-   * The state store that this component will expose as a service.
-   */
   private final StateStore stateStore;
 
+  /**
+   * Constructor.
+   *
+   * @param stateStore the state store that this component will expose as a service.
+   */
   public StateStoreGrpcComponentWrapper(final StateStore stateStore) {
     this.stateStore = Objects.requireNonNull(stateStore);
   }
@@ -76,6 +77,16 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
   }
 
   @Override
+  public void ping(final ComponentProtos.PingRequest request,
+                   final StreamObserver<ComponentProtos.PingResponse> responseObserver) {
+    Mono.just(request)
+        .flatMap(req -> stateStore.ping())
+        // Response is functionally and structurally equivalent to Empty, nothing to fill.
+        .map(successfulPing -> ComponentProtos.PingResponse.getDefaultInstance())
+        .subscribe(responseObserver::onNext, responseObserver::onError, responseObserver::onCompleted);
+  }
+
+  @Override
   public void delete(final DeleteRequest request, final StreamObserver<State.DeleteResponse> responseObserver) {
     Mono.just(request)
         .map(io.dapr.components.domain.state.DeleteRequest::new) //Convert to local domain
@@ -88,10 +99,13 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
   @Override
   public void bulkDelete(final BulkDeleteRequest request,
                          final StreamObserver<State.BulkDeleteResponse> responseObserver) {
-    Flux.fromIterable(request.getItemsList())
-        .map(io.dapr.components.domain.state.DeleteRequest::new) // Convert to local domain/model
-        .flatMap(stateStore::delete)
-        .then() // convert this Flux to a Mono
+    Mono.just(request)
+        // Convert to local domain/model
+        .flatMapIterable(BulkDeleteRequest::getItemsList)
+        .map(io.dapr.components.domain.state.DeleteRequest::new)
+        .collectList()
+        // Perform the bulk operation
+        .map(this.stateStore::bulkDelete)
         .map(response -> State.BulkDeleteResponse.getDefaultInstance())
         .subscribe(responseObserver::onNext, responseObserver::onError, responseObserver::onCompleted);
   }
@@ -118,10 +132,15 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
   @Override
   public void bulkGet(final BulkGetRequest request,
                       final StreamObserver<BulkGetResponse> responseObserver) {
-    Flux.fromIterable(request.getItemsList())
-        .map(io.dapr.components.domain.state.GetRequest::new) // Convert to local domain/model
+    Mono.just(request)
+        // Convert to local domain/model
+        .flatMapIterable(BulkGetRequest::getItemsList)
+        .map(io.dapr.components.domain.state.GetRequest::new)
+        .collectList()
+        // Perform the bulk operation
+        .flatMapMany(this.stateStore::bulkGet)
         // Let's convert all requested items into BulkStateItems objects.
-        .flatMap(requestedItem -> stateStore.get(requestedItem)
+        .flatMap(requestedItem -> requestedItem.response()
             // If value is present, convert it to an appropriate BulkStateItem object
             .map(value -> BulkStateItem.newBuilder()
                 .setKey(requestedItem.key())
@@ -162,22 +181,15 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
 
   @Override
   public void bulkSet(final BulkSetRequest request, final StreamObserver<State.BulkSetResponse> responseObserver) {
-    // Do a forEach, calling stateStore.set for each item in the bulk request
-    Flux.fromIterable(request.getItemsList())
-        .map(SetRequest::new)  // Convert to local domain/model
-        .flatMap(stateStore::set)
-        .then() // convert this Flux to a Mono
+    Mono.just(request)
+        // Convert to local domain/model
+        .flatMapIterable(BulkSetRequest::getItemsList)
+        .map(SetRequest::new)
+        .collectList()
+        // Perform the bulk operation
+        .flatMap(this.stateStore::bulkSet)
         // Response is functionally and structurally equivalent to Empty, nothing to fill.
         .map(allRequestsWereSuccessful -> State.BulkSetResponse.getDefaultInstance())
         .subscribe(responseObserver::onNext, responseObserver::onError, responseObserver::onCompleted);
   }
-
-  @Override
-  public void ping(final ComponentProtos.PingRequest request,
-                   final StreamObserver<ComponentProtos.PingResponse> responseObserver) {
-    // Response is functionally and structurally equivalent to Empty, nothing to fill.
-    responseObserver.onNext(ComponentProtos.PingResponse.getDefaultInstance());
-    responseObserver.onCompleted();
-  }
-
 }
