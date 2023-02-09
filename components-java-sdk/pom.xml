@@ -27,11 +27,38 @@
             <artifactId>components-java-sdk-autogen</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <!--This is our async framework. Dapr Java SDK uses the same -->
         <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-core</artifactId>
             <version>3.3.11.RELEASE</version>
         </dependency>
-    </dependencies>
 
+        <!-- Netty's Unix Domain Socket support for Linux and Mac, for both AMD64 and ARM64 -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-native-kqueue</artifactId>
+            <version>4.1.79.Final</version>
+            <classifier>osx-aarch_64</classifier>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-native-kqueue</artifactId>
+            <version>4.1.79.Final</version>
+            <classifier>osx-x86_64</classifier>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-native-epoll</artifactId>
+            <version>4.1.79.Final</version>
+            <classifier>linux-x86_64</classifier>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-native-epoll</artifactId>
+            <version>4.1.79.Final</version>
+            <classifier>linux-aarch_64</classifier>
+        </dependency>
+    </dependencies>
 </project>

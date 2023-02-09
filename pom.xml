@@ -15,6 +15,7 @@
     <modules>
         <module>components-java-sdk-autogen</module>
         <module>components-java-sdk</module>
+        <module>components-java-sdk-examples</module>
     </modules>
 
     <properties>
