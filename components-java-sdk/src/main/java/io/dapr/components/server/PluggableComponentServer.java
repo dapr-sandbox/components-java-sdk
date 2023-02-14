@@ -40,9 +40,11 @@ import java.util.logging.Logger;
  * Container for pluggable components, responsible for hosting and turning them into a server.
  *
  * <p>Takes care of:
- * 1. setting up Unix Domain Socket files for each pluggable component,
- * 2. environment variable handling,
- * 3. setting up the required server machinery to expose the service and handle requests for it.
+ * <ol>
+ *   <li>setting up Unix Domain Socket files for each pluggable component,</li>
+ *   <li>environment variable handling,</li>
+ *   <li>setting up the required server machinery to expose the service and handle requests for it.</li>
+ * </ol>
  *
  * <p>If you end up needing to extend functionality of this class it might be simpler re-implementing it.
  */

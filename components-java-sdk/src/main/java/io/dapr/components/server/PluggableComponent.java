@@ -47,7 +47,7 @@ public final class PluggableComponent {
   private final List<BindableService> exposedServices = new ArrayList<>();
 
   // A given component API (state store, pubusb, binding etc) can be registered only once.
-  private boolean alreadyAddedStaStore = false;
+  private boolean alreadyAddedStateStore = false;
 
   /**
    * Creates a new pluggable component.
@@ -75,7 +75,7 @@ public final class PluggableComponent {
    * @return The current {@link PluggableComponent} instance, so calls can be chained.
    */
   public PluggableComponent withStateStore(StateStore stateStore) {
-    assert !alreadyAddedStaStore; // No, you cannot add multiple stateStores
+    assert !alreadyAddedStateStore; // No, you cannot add multiple stateStores
 
     exposedServices.add(new StateStoreGrpcComponentWrapper(stateStore));
 
@@ -90,7 +90,7 @@ public final class PluggableComponent {
     // }
 
     // StateStore added and nothing else can be added
-    alreadyAddedStaStore = true;
+    alreadyAddedStateStore = true;
     return this;
   }
 
