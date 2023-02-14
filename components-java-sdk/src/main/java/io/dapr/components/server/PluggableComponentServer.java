@@ -56,6 +56,8 @@ public class PluggableComponentServer {
    */
   private final String unixDomainSocketFolder;
 
+  private final String unixDomainSocketSuffix;
+
   // Our "list" or registered components. We use a Map to avoid duplicated registrations.
   private final Map<String, Server> servers = new HashMap<>();
 
@@ -64,6 +66,9 @@ public class PluggableComponentServer {
    */
   public PluggableComponentServer() {
     this.unixDomainSocketFolder = getUnixSocketFolderOrAbort();
+    this.unixDomainSocketSuffix = getEnvVarOrDefault(
+        Constants.EnvironmentVariable.DAPR_COMPONENTS_SOCKET_EXTENSION,
+        Constants.Defaults.DAPR_COMPONENTS_SOCKET_EXTENSION);
   }
 
   /**
@@ -190,10 +195,7 @@ public class PluggableComponentServer {
   }
 
   private Path buildPathForComponentUnixDomainSocket(final String componentName) {
-    final String suffix = getEnvVarOrDefault(
-        Constants.EnvironmentVariable.DAPR_COMPONENTS_SOCKET_EXTENSION,
-        Constants.Defaults.DAPR_COMPONENTS_SOCKET_EXTENSION);
-    final String udsFilename = componentName + '.' + suffix;
+    final String udsFilename = componentName + '.' + unixDomainSocketSuffix;
     final Path targetFolder = Paths.get(unixDomainSocketFolder);
     return targetFolder.resolve(udsFilename);
   }
