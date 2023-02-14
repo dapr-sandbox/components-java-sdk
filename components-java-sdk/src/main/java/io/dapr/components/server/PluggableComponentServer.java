@@ -207,8 +207,8 @@ public class PluggableComponentServer {
   private void startServers() throws IOException {
     // For each registered server, start it and set up add it to a compound shutdown hook.
     for (var componentNameAndServer : servers.entrySet()) {
-      final var componentName = componentNameAndServer.getKey();
-      final var server = componentNameAndServer.getValue();
+      final String componentName = componentNameAndServer.getKey();
+      final Server server = componentNameAndServer.getValue();
 
       server.start();
       fixUnixDomainSocketFilePermissions(componentName);
@@ -218,9 +218,11 @@ public class PluggableComponentServer {
     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
       // Use stderr here since the logger may have been reset by its JVM shutdown hook.
       System.err.println("*** shutting down gRPC server since JVM is shutting down");
-      servers.forEach((componentName, server) -> {
+      servers.keySet().parallelStream().forEach(componentName -> {
         try {
-          System.err.println("    *** shutting doing server instance " + server.toString());
+          final Server server = servers.get(componentName);
+          System.err.println("    *** shutting down server for component " + componentName
+              + " with instance " + server.toString());
           server.shutdown().awaitTermination(30, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
           e.printStackTrace(System.err);
