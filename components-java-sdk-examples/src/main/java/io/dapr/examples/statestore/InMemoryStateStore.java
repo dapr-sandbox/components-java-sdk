@@ -31,14 +31,8 @@ public class InMemoryStateStore implements StateStore {
 
   @Override
   public Mono<Void> init(Map<String, String> properties) {
-    // log.info("Initializing InMemoryState Store."); // I was born ready, babe
     return Mono.empty();
   }
-
-  //  @Override
-  //  public Mono<List<String>> getFeatures() {
-  //    return Mono.just(Collections.emptyList());
-  //  }
 
   @Override
   public Mono<GetResponse> get(GetRequest getRequest) {

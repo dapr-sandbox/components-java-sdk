@@ -112,7 +112,7 @@ public class PluggableComponentServer {
     }
 
     // Unix Domain Socket setup
-    final var componentUdsPath = buildPathForComponentUnixDomainSocket(componentName);
+    final Path componentUdsPath = buildPathForComponentUnixDomainSocket(componentName);
     log.info("Configuring server to listen to unix socket domain on file " + componentUdsPath.toAbsolutePath());
     // If file exists, remove it.
     final File componentUdsFile = componentUdsPath.toFile();
@@ -211,6 +211,7 @@ public class PluggableComponentServer {
       final var server = componentNameAndServer.getValue();
 
       server.start();
+      fixUnixDomainSocketFilePermissions(componentName);
       log.info("Started server for " + componentName);
     }
 
@@ -227,6 +228,27 @@ public class PluggableComponentServer {
       });
       System.err.println("*** server shut down");
     }));
+  }
+
+  /*
+   * In other languages/runtimes, such as Go and .Net, we can invoke the syscall `umask` to ensure any UDS this
+   * server creates are world-Read/Writable. It is a simple and elegant way to solve the "permission issue".
+   * This is not the case for Java: the std. SDK doesn't expose such syscall. To address this we perform the
+   * equivalent of `chmod ugo=rwx` on each unix domain socket file we create.
+   */
+  private void fixUnixDomainSocketFilePermissions(final String componentName) {
+    final File unixDomainSocketFile = buildPathForComponentUnixDomainSocket(componentName).toFile();
+    // We assume that the UDS file is created after server.start(). If this assumption proves to be false (for instance,
+    // because this creation happens in another thread) we will be notified.
+    assert unixDomainSocketFile.exists();
+    final boolean notOwnerOnly = false; // Fix permissions for other users too, not only for its owner.
+    // chmod ugo=rwx
+    final boolean success = unixDomainSocketFile.setExecutable(true, notOwnerOnly)
+        && unixDomainSocketFile.setReadable(true, notOwnerOnly)
+        && unixDomainSocketFile.setWritable(true, notOwnerOnly);
+    if (!success) {
+      logFatalAndAbort("Failed to fix permissions for file " + unixDomainSocketFile);
+    }
   }
 
   /**

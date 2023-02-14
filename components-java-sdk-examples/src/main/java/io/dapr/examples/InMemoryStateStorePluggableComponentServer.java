@@ -34,6 +34,10 @@ public class InMemoryStateStorePluggableComponentServer {
             .withName("my-in-memory-state-store")
             .withStateStore(new InMemoryStateStore())
         )
+        .registerComponent(PluggableComponent
+            .withName("another-in-memory-state-store")
+            .withStateStore(new InMemoryStateStore())
+        )
         .run();
   }
 }
