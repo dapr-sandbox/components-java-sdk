@@ -15,6 +15,7 @@
     <modules>
         <module>components-java-sdk-autogen</module>
         <module>components-java-sdk</module>
+        <module>components-java-sdk-examples</module>
     </modules>
 
     <properties>
@@ -23,6 +24,7 @@
         <grpc.version>1.42.1</grpc.version>
         <protobuf.version>3.17.3</protobuf.version>
         <springboot.version>2.3.5.RELEASE</springboot.version>
+        <netty-transport-native.version>4.1.79.Final</netty-transport-native.version>
 
         <spotbugs.version>4.7.3.0</spotbugs.version>
         <spotbugs.fail>true</spotbugs.fail>
