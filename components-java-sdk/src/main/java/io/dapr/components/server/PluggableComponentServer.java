@@ -16,6 +16,7 @@ package io.dapr.components.server;
 import io.grpc.BindableService;
 import io.grpc.Server;
 import io.grpc.netty.NettyServerBuilder;
+import io.grpc.protobuf.services.ProtoReflectionService;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.ServerChannel;
 import io.netty.channel.epoll.EpollEventLoopGroup;
@@ -143,7 +144,9 @@ public class PluggableComponentServer {
     final NettyServerBuilder serverBuilder = NettyServerBuilder.forAddress(unixSocket)
         .channelType(serverChannelClass)
         .workerEventLoopGroup(eventLoopGroup)
-        .bossEventLoopGroup(eventLoopGroup);
+        .bossEventLoopGroup(eventLoopGroup)
+        .addService(ProtoReflectionService.newInstance())
+        .keepAliveTime(1, TimeUnit.MINUTES);
 
     // Add the services exposed by this pluggable component
     exposedServices.forEach(serverBuilder::addService);
