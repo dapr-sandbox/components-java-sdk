@@ -75,6 +75,14 @@
             <artifactId>grpc-netty-shaded</artifactId>
             <version>${grpc.version}</version>
         </dependency>
+        <!-- Dapr Pluggable Components need to implement GRPC Reflection, which is defined in this package. -->
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-services</artifactId>
+            <version>${grpc.version}</version>
+        </dependency>
+
+
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
