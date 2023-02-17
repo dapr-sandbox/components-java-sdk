@@ -96,6 +96,19 @@
                             <outputDirectory>${protobuf.input.directory.components}</outputDirectory>
                         </configuration>
                     </execution>
+                    <!-- components/bindings -->
+                    <execution>
+                        <id>getComponentsBindingsProto</id>
+                        <!-- the wget goal actually binds itself to this phase by default -->
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>${dapr.proto.baseurl}/components/v1/bindings.proto</url>
+                            <outputDirectory>${protobuf.input.directory.components}</outputDirectory>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <!-- Generate sources from downloaded protos -->
