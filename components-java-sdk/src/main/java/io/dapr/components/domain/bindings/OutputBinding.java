@@ -15,8 +15,9 @@ package io.dapr.components.domain.bindings;
 
 import io.dapr.components.aspects.InitializableWithProperties;
 import io.dapr.components.aspects.Pingable;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 /**
  * Interface for output bindings.
@@ -34,7 +35,7 @@ public interface OutputBinding extends InitializableWithProperties, Pingable {
   /**
    * ListOperations list system supported operations.
    *
-   * @return A Mono with the List of operations suported by this output binding component.
+   * @return A Mono with the List of operations supported by this output binding component.
    */
-  Mono<ListOperationsResponse> listOperations();
+  Mono<List<String>> listOperations();
 }
