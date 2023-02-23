@@ -6,12 +6,12 @@
     <parent>
         <groupId>io.dapr</groupId>
         <artifactId>components-java-sdk-parent</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>components-java-sdk-examples</artifactId>
     <packaging>jar</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>${revision}</version>
     <name>components-java-sdk-examples</name>
     <description>Examples for Dapr Java Pluggable Components SDK</description>
 

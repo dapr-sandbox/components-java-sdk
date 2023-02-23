@@ -7,7 +7,7 @@
     <groupId>io.dapr</groupId>
     <artifactId>components-java-sdk-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>${revision}</version>
     <name>components-java-sdk-parent</name>
     <description>Java SDK for Dapr Pluggable Components.</description>
     <url>https://dapr.io</url>
@@ -19,6 +19,10 @@
     </modules>
 
     <properties>
+        <!-- We define the version for all packages in this project only once. -->
+        <!-- Reference https://stackoverflow.com/questions/10582054/.  -->
+        <revision>0.0.2-SNAPSHOT</revision>
+
         <dapr.proto.baseurl>https://raw.githubusercontent.com/dapr/dapr/v1.9.5/dapr/proto</dapr.proto.baseurl>
         <!-- Pin library dependencies to specific versions-->
         <grpc.version>1.42.1</grpc.version>
@@ -148,7 +152,13 @@
 
     <!-- TODO add reporting section -->
 
-    <!-- TODO add distributionManagement -->
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/dapr-sandbox/components-java-sdk</url>
+        </repository>
+    </distributionManagement>
     
     <licenses>
         <license>
