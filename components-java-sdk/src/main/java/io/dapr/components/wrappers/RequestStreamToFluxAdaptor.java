@@ -34,7 +34,7 @@ import static reactor.core.publisher.Sinks.EmitFailureHandler.FAIL_FAST;
  * </p>
  *
  * <p>>gRPC is wierd in that a bi-directional stream receive its input requests by
- * means of a {@link StreamObserver} its an RPC message handler return. Think about it:
+ * means of a {@link StreamObserver} its RPC message handler returns. Think about it:
  * we return responses on a StreamObserver we receive as argument but we receive requests in a
  * StreamObserver we return as result. Mind bogging, right? </p>
  *
@@ -47,7 +47,7 @@ import static reactor.core.publisher.Sinks.EmitFailureHandler.FAIL_FAST;
 public final class RequestStreamToFluxAdaptor<StreamT> {
   private final StreamObserver<StreamT> requestStreamObserver;
 
-  boolean isThisTheFirstItem = true;
+  private boolean isThisTheFirstItem = true;
 
   /**
    * Constructor.
@@ -70,7 +70,7 @@ public final class RequestStreamToFluxAdaptor<StreamT> {
   }
 
   /**
-   * Creates a {@link StreamObserver} that forwards all its received events to a {@link Sinks}.
+   * Creates a {@link StreamObserver} that forwards all its received events to a {@link Sinks.Many}.
    *
    * @param sink the sink we will forward events (onNext, onError and onComplete) to.
    * @param onFirstCallback the callback we invoke upon receiving the very first request.
@@ -85,7 +85,13 @@ public final class RequestStreamToFluxAdaptor<StreamT> {
       public void onNext(StreamT request) {
         if (isThisTheFirstItem) {
           isThisTheFirstItem = false; // We have seen the first item :)
-          onFirstCallback.accept(request, sink.asFlux());
+          try {
+            onFirstCallback.accept(request, sink.asFlux());
+          } catch (Exception e) {
+            // TODO(tmacam) add logging
+            sink.emitError(e, FAIL_FAST)
+            throw new RuntimeException(e);
+          }
         } else {
           sink.emitNext(request, FAIL_FAST);
         }
