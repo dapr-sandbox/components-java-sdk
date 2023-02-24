@@ -89,7 +89,7 @@ public final class RequestStreamToFluxAdaptor<StreamT> {
             onFirstCallback.accept(request, sink.asFlux());
           } catch (Exception e) {
             // TODO(tmacam) add logging
-            sink.emitError(e, FAIL_FAST)
+            sink.emitError(e, FAIL_FAST);
             throw new RuntimeException(e);
           }
         } else {
