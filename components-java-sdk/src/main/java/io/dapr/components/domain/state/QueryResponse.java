@@ -13,6 +13,8 @@
 
 package io.dapr.components.domain.state;
 
+import dapr.proto.components.v1.State;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -36,5 +38,18 @@ public record QueryResponse(List<QueryResponseItem> items, String token, Map<Str
     this.items = List.copyOf(Objects.requireNonNull(items));
     this.token = Objects.requireNonNull(token);
     this.metadata = Map.copyOf(Objects.requireNonNull(metadata));
+  }
+
+  /**
+   * Conversion method.
+   *
+   * @return The provided object converted to its protocol buffer equivalent.
+   */
+  public State.QueryResponse toProto() {
+    return State.QueryResponse.newBuilder()
+        .addAllItems(items.stream().map(QueryResponseItem::toProto).toList())
+        .setToken(token)
+        .putAllMetadata(metadata)
+        .build();
   }
 }

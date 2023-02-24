@@ -14,7 +14,6 @@
 package io.dapr.components.domain.state.options;
 
 import dapr.proto.components.v1.State;
-import io.dapr.components.domain.state.StateOptions;
 
 /**
  * Enum describing the supported concurrency for state.
@@ -30,8 +29,8 @@ public enum StateConcurrency {
    *
    * @return The gRPC equivalent.
    */
-  public State.StateOptions.StateConcurrency getValue() {
-    return getValue(this);
+  public State.StateOptions.StateConcurrency toProto() {
+    return toProto(this);
   }
 
   /**
@@ -39,7 +38,7 @@ public enum StateConcurrency {
    * @param sdkEnum the SDK enum to convert.
    * @return The gRPC equivalent
    */
-  public State.StateOptions.StateConcurrency getValue(StateConcurrency sdkEnum) {
+  public State.StateOptions.StateConcurrency toProto(StateConcurrency sdkEnum) {
     return switch (sdkEnum) {
       case UNSPECIFIED -> State.StateOptions.StateConcurrency.CONCURRENCY_UNSPECIFIED;
       case FIRST_WRITE -> State.StateOptions.StateConcurrency.CONCURRENCY_FIRST_WRITE;
@@ -53,7 +52,7 @@ public enum StateConcurrency {
    * @param value the gRPC enum
    * @return the equivalent SDK enum.
    */
-  public static StateConcurrency fromValue(State.StateOptions.StateConcurrency value) {
+  public static StateConcurrency fromProto(State.StateOptions.StateConcurrency value) {
     return switch (value) {
       case CONCURRENCY_UNSPECIFIED -> UNSPECIFIED;
       case CONCURRENCY_FIRST_WRITE -> FIRST_WRITE;

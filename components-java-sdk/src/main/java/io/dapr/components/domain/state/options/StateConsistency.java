@@ -14,7 +14,6 @@
 package io.dapr.components.domain.state.options;
 
 import dapr.proto.components.v1.State;
-import io.dapr.components.domain.state.StateOptions;
 
 /**
  * Enum describing the supported consistency for state.
@@ -31,8 +30,8 @@ public enum StateConsistency {
    *
    * @return The gRPC equivalent.
    */
-  public State.StateOptions.StateConsistency getValue() {
-    return getValue(this);
+  public State.StateOptions.StateConsistency toProto() {
+    return toProto(this);
   }
 
   /**
@@ -40,7 +39,7 @@ public enum StateConsistency {
    * @param sdkEnum the SDK enum to convert.
    * @return The gRPC equivalent
    */
-  public static State.StateOptions.StateConsistency getValue(StateConsistency sdkEnum) {
+  public static State.StateOptions.StateConsistency toProto(StateConsistency sdkEnum) {
     return switch (sdkEnum) {
       case UNSPECIFIED -> State.StateOptions.StateConsistency.CONSISTENCY_UNSPECIFIED;
       case EVENTUAL -> State.StateOptions.StateConsistency.CONSISTENCY_EVENTUAL;
@@ -54,7 +53,7 @@ public enum StateConsistency {
    * @param value the gRPC enum
    * @return the equivalent SDK enum.
    */
-  public static StateConsistency fromValue(State.StateOptions.StateConsistency value) {
+  public static StateConsistency fromProto(State.StateOptions.StateConsistency value) {
     return switch (value) {
       case CONSISTENCY_UNSPECIFIED -> UNSPECIFIED;
       case CONSISTENCY_EVENTUAL -> EVENTUAL;

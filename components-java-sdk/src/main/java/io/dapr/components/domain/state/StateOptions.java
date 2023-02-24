@@ -27,7 +27,7 @@ public record StateOptions(StateConcurrency concurrency, StateConsistency consis
   }
 
   public StateOptions(State.StateOptions other) {
-    this(StateConcurrency.fromValue(other.getConcurrency()),
-        StateConsistency.fromValue(other.getConsistency()));
+    this(StateConcurrency.fromProto(other.getConcurrency()),
+        StateConsistency.fromProto(other.getConsistency()));
   }
 }

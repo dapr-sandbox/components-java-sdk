@@ -80,12 +80,13 @@ public record SetRequest(
   }
 
   /**
-   * Conversion constructor.
+   * Conversion from protocol buffers.
    *
    * @param other The Protocol Buffer representation of a SetRequest.
+   * @return The provided protocol buffer object converted into the local domain.
    */
-  public SetRequest(dapr.proto.components.v1.State.SetRequest other) {
-    this(other.getKey(),
+  public static  SetRequest fromProto(dapr.proto.components.v1.State.SetRequest other) {
+    return new SetRequest(other.getKey(),
         other.getValue(),
         other.getEtag().getValue(),
         other.getMetadataMap(),

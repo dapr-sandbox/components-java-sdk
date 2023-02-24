@@ -14,6 +14,7 @@
 package io.dapr.components.domain.state;
 
 import com.google.protobuf.ByteString;
+import dapr.proto.components.v1.State;
 
 /**
  * QueryItem is an object representing a single entry in query results.
@@ -36,5 +37,20 @@ public record QueryResponseItem(String key, ByteString data, String etag, String
    */
   public QueryResponseItem(String key, final byte[] data, String etag, String error, String contentType) {
     this(key, ByteString.copyFrom(data), etag, error, contentType);
+  }
+
+  /**
+   * Conversion method.
+   *
+   * @return The provided object converted to its protocol buffer equivalent.
+   */
+  public State.QueryItem toProto() {
+    return State.QueryItem.newBuilder()
+        .setKey(key)
+        .setData(data)
+        .setEtag(State.Etag.newBuilder().setValue(etag).build())
+        .setError(error)
+        .setContentType(contentType)
+        .build();
   }
 }

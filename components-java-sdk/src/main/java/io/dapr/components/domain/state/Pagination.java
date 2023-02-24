@@ -13,11 +13,26 @@
 
 package io.dapr.components.domain.state;
 
+import dapr.proto.components.v1.State;
+
 /**
  * Representation of pagination parameters.
  *
  * @param limit Maximum of results that should be returned.
  * @param token The pagination token.
  */
-public record Pagination(int limit, String token) {
+public record Pagination(long limit, String token) {
+
+  /**
+   * Converts from protocol buffer types to local domain types.
+   *
+   * @param other The Protocol Buffer representation of Pagination.
+   * @return The provided protocol buffer object converted into the local domain.
+   */
+  public static Pagination fromProto(State.Pagination other) {
+    return new Pagination(
+        other.getLimit(),
+        other.getToken()
+    );
+  }
 }

@@ -25,6 +25,7 @@ import dapr.proto.components.v1.State.Etag;
 import dapr.proto.components.v1.State.GetRequest;
 import dapr.proto.components.v1.StateStoreGrpc;
 import io.dapr.components.domain.state.BulkGetError;
+import io.dapr.components.domain.state.GetResponse;
 import io.dapr.components.domain.state.SetRequest;
 import io.dapr.components.domain.state.StateStore;
 import io.dapr.v1.ComponentProtos;
@@ -89,7 +90,7 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
   @Override
   public void delete(final DeleteRequest request, final StreamObserver<State.DeleteResponse> responseObserver) {
     Mono.just(request)
-        .map(io.dapr.components.domain.state.DeleteRequest::new) //Convert to local domain
+        .map(io.dapr.components.domain.state.DeleteRequest::fromProto) //Convert to local domain
         .flatMap(stateStore::delete)
         // Response is functionally and structurally equivalent to Empty, nothing to fill.
         .map(response -> State.DeleteResponse.getDefaultInstance())
@@ -102,7 +103,7 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
     Mono.just(request)
         // Convert to local domain/model
         .flatMapIterable(BulkDeleteRequest::getItemsList)
-        .map(io.dapr.components.domain.state.DeleteRequest::new)
+        .map(io.dapr.components.domain.state.DeleteRequest::fromProto)
         .collectList()
         // Perform the bulk operation
         .map(this.stateStore::bulkDelete)
@@ -116,14 +117,7 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
         .map(io.dapr.components.domain.state.GetRequest::new) // Convert to local domain/model
         .flatMap(stateStore::get)
         // If value is present, map it to an appropriate GetResponse object
-        .map(response -> State.GetResponse.newBuilder()
-            .setData(response.data())
-            .setEtag(Etag.newBuilder()
-                .setValue(response.etag())
-                .build())
-            .putAllMetadata(response.metadata())
-            .setContentType(response.contentType())
-          .build())
+        .map(GetResponse::toProto)
         // otherwise return an empty response
         .defaultIfEmpty(EMPTY_GET_RESPONSE)
         .subscribe(responseObserver::onNext, responseObserver::onError, responseObserver::onCompleted);
@@ -172,7 +166,7 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
   @Override
   public void set(final State.SetRequest request, final StreamObserver<State.SetResponse> responseObserver) {
     Mono.just(request)
-        .map(SetRequest::new)  // Convert to local domain/model
+        .map(SetRequest::fromProto)  // Convert to local domain/model
         .flatMap(stateStore::set)
         // Response is functionally and structurally equivalent to Empty, nothing to fill.
         .map(response -> State.SetResponse.getDefaultInstance())
@@ -184,7 +178,7 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
     Mono.just(request)
         // Convert to local domain/model
         .flatMapIterable(BulkSetRequest::getItemsList)
-        .map(SetRequest::new)
+        .map(SetRequest::fromProto)
         .collectList()
         // Perform the bulk operation
         .flatMap(this.stateStore::bulkSet)

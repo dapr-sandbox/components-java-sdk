@@ -13,6 +13,7 @@
 
 package io.dapr.components.domain.state;
 
+import dapr.proto.components.v1.State;
 import io.dapr.components.domain.state.options.Order;
 
 /**
@@ -23,4 +24,7 @@ import io.dapr.components.domain.state.options.Order;
  */
 public record Sorting(String key, Order order) {
 
+  public static Sorting fromProto(State.Sorting other) {
+    return new Sorting(other.getKey(), Order.fromProto(other.getOrder()));
+  }
 }

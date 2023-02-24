@@ -13,6 +13,8 @@
 
 package io.dapr.components.domain.state;
 
+import dapr.proto.components.v1.State;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -32,5 +34,15 @@ public record QueryRequest(Query query, Map<String,String> metadata) {
   public QueryRequest(final Query query, final Map<String, String> metadata) {
     this.query = Objects.requireNonNull(query);
     this.metadata = Objects.requireNonNull(metadata);
+  }
+
+  /**
+   * Converts from protocol buffer types to local domain types.
+   *
+   * @param other The Protocol Buffer representation of QueryRequest.
+   * @return The provided protocol buffer object converted into the local domain.
+   */
+  public static QueryRequest fromProto(State.QueryRequest other) {
+    return new QueryRequest(Query.fromProto(other.getQuery()), other.getMetadataMap());
   }
 }
