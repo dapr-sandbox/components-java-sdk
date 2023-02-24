@@ -16,7 +16,6 @@ package io.dapr.components.domain.bindings;
 import io.dapr.components.aspects.InitializableWithProperties;
 import io.dapr.components.aspects.Pingable;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * Interface for input bindings.
@@ -28,9 +27,10 @@ public interface InputBinding extends InitializableWithProperties, Pingable {
    * will close the stream and return the status on any error. In case of closed
    * connection, the client should re-establish the stream.
    *
-   * @param request A Flux representing the initial request object and the stream of
-   *                acknowledgements sent back by the client to the component.
+   * @param first The initial request object.
+   * @param acks A flux representing stream of acknowledgements sent back by the client
+   *            to the component.
    * @return A Flux containing the responses returned by the component.
    */
-  Mono<ReadResponse> read(Flux<ReadRequest> request);
+  Flux<ReadResponse> read(ReadRequest first, Flux<ReadRequest> acks);
 }

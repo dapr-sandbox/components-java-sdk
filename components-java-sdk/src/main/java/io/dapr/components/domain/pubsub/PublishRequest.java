@@ -49,12 +49,13 @@ public record PublishRequest(ByteString data, String pubSubName, String topic, M
   }
 
   /**
-   * Conversion constructor.
+   * Converts from protocol buffer types to local domain types.
    *
    * @param other The Protocol Buffer representation of a PublishRequest.
+   * @return The provided protocol buffer object converted into the local domain.
    */
-  public PublishRequest(dapr.proto.components.v1.Pubsub.PublishRequest other) {
-    this(other.getData(),
+  public static PublishRequest fromProto(dapr.proto.components.v1.Pubsub.PublishRequest other) {
+    return new PublishRequest(other.getData(),
         other.getPubsubName(),
         other.getTopic(),
         other.getMetadataMap(),

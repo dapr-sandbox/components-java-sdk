@@ -21,9 +21,10 @@ public record PullMessagesRequest(Topic topic, String ackMessageId, Optional<Str
    * Conversion constructor.
    *
    * @param other The Protocol Buffer representation of a PullMessagesRequest.
+   * @return The provided protocol buffer object converted into the local domain.
    */
-  public PullMessagesRequest(dapr.proto.components.v1.Pubsub.PullMessagesRequest other) {
-    this(new Topic(other.getTopic()),
+  public static PullMessagesRequest fromProto(dapr.proto.components.v1.Pubsub.PullMessagesRequest other) {
+    return new PullMessagesRequest(new Topic(other.getTopic()),
         other.getAckMessageId(),
         other.hasAckError()
             ? Optional.of(other.getAckError().getMessage())

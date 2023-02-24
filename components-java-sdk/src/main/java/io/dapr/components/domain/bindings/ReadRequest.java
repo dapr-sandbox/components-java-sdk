@@ -26,12 +26,13 @@ import java.util.Optional;
  */
 public record ReadRequest(ByteString responseData, String messageId, Optional<String> responseErrorMessage) {
   /**
-   * Conversion constructor.
+   * Conversion method.
    *
    * @param other The Protocol Buffer representation of a ReadRequest.
+   * @return The provided protocol buffer object converted into the local domain.
    */
-  public ReadRequest(dapr.proto.components.v1.Bindings.ReadRequest other) {
-    this(other.getResponseData(),
+  public static ReadRequest fromProto(dapr.proto.components.v1.Bindings.ReadRequest other) {
+    return new ReadRequest(other.getResponseData(),
         other.getMessageId(),
         other.hasResponseError()
             ? Optional.of(other.getResponseError().getMessage())

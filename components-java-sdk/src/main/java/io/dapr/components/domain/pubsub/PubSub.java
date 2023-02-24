@@ -39,12 +39,13 @@ public interface PubSub extends InitializableWithProperties, AdvertisesFeatures,
    * the stream. The first message MUST contain a `topicName` attribute on it that
    * should be used for the entire streaming pull.
    *
-   * @param request A series of PullMessageRequest. Notice that the very first message in that stream
+   * @param first The very first message in that stream. It
    *               <b>MUST</b> contain a {@code topicName} attribute on it that should be used for
-   *               the entire streaming pull. Next messages sent to this flux will be used to
+   *               the entire streaming pull.
+   * @param acks All remaining  messages sent to this flux, which will be used to
    *                acknowledge received messages.
    * @return A Flux with all the acknowledgements we are sending to a server.
    */
-  Flux<PullMessagesResponse> pullMessages(Flux<PullMessagesRequest> request);
+  Flux<PullMessagesResponse> pullMessages(PullMessagesRequest first, Flux<PullMessagesRequest> acks);
 
 }
