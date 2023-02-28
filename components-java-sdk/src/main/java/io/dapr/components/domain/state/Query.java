@@ -13,10 +13,14 @@
 
 package io.dapr.components.domain.state;
 
+import com.google.protobuf.Any;
+import dapr.proto.components.v1.State;
+
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Representation of a Query.
@@ -38,5 +42,24 @@ public record Query(Map<String, Object> filter, List<Sorting> sort, @Nullable Pa
     this.filter = Map.copyOf(Objects.requireNonNull(filter));
     this.sort = List.copyOf(Objects.requireNonNull(sort));
     this.pagination = pagination;
+  }
+
+  /**
+   * Converts from protocol buffer types to local domain types.
+   *
+   * @param other The Protocol Buffer representation of a Query.
+   * @return The provided protocol buffer object converted into the local domain.
+   */
+  public static Query fromProto(State.Query other) {
+    final Map<String, Object> filter = other.getFilterMap()
+        .entrySet()
+        .stream()
+        .collect(Collectors.toMap(
+            Map.Entry::getKey,
+            entry -> (Object) entry.getValue()));
+    return new Query(
+        filter,
+        other.getSortList().stream().map(Sorting::fromProto).toList(),
+        Pagination.fromProto(other.getPagination()));
   }
 }

@@ -14,7 +14,6 @@
 package io.dapr.components.domain.state.options;
 
 import dapr.proto.components.v1.State;
-import io.dapr.components.domain.state.Sorting;
 
 public enum Order {
   ASC,
@@ -26,8 +25,8 @@ public enum Order {
    *
    * @return The gRPC equivalent.
    */
-  public State.Sorting.Order getValue() {
-    return getValue(this);
+  public State.Sorting.Order toProto() {
+    return toProto(this);
   }
 
   /**
@@ -35,7 +34,7 @@ public enum Order {
    * @param sdkEnum the SDK enum to convert.
    * @return The gRPC equivalent
    */
-  public static State.Sorting.Order getValue(Order sdkEnum) {
+  public static State.Sorting.Order toProto(Order sdkEnum) {
     return switch (sdkEnum) {
       case ASC -> State.Sorting.Order.ASC;
       case DESC -> State.Sorting.Order.DESC;
@@ -48,7 +47,7 @@ public enum Order {
    * @param value the gRPC enum
    * @return the equivalent SDK enum.
    */
-  public static Order fromValue(State.Sorting.Order value) {
+  public static Order fromProto(State.Sorting.Order value) {
     return switch (value) {
       case ASC -> Order.ASC;
       case DESC -> Order.DESC;

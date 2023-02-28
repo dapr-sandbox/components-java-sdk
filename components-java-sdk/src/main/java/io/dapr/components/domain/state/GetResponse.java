@@ -14,6 +14,7 @@
 package io.dapr.components.domain.state;
 
 import com.google.protobuf.ByteString;
+import dapr.proto.components.v1.State;
 
 import java.util.Collections;
 import java.util.Map;
@@ -74,5 +75,21 @@ public record GetResponse(ByteString data, String etag, Map<String, String> meta
    */
   public GetResponse(final byte[] data, final String etag) {
     this(data, etag, Collections.emptyMap(), DEFAULT_CONTENT_TYPE);
+  }
+
+  /**
+   * Conversion method.
+   *
+   * @return The provided object converted to its protocol buffer equivalent.
+   */
+  public State.GetResponse toProto() {
+    return State.GetResponse.newBuilder()
+        .setData(data)
+        .setEtag(State.Etag.newBuilder()
+            .setValue(etag)
+            .build())
+        .putAllMetadata(metadata)
+        .setContentType(contentType)
+        .build();
   }
 }

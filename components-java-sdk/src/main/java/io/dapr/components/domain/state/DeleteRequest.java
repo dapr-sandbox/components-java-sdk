@@ -50,12 +50,13 @@ public record DeleteRequest(
   }
 
   /**
-   * Conversion constructor.
+   * Conversion from protocol buffers.
    *
    * @param other The Protocol Buffer representation of a SetRequest.
+   * @return The provided protocol buffer object converted into the local domain.
    */
-  public DeleteRequest(dapr.proto.components.v1.State.DeleteRequest other) {
-    this(other.getKey(),
+  public static DeleteRequest fromProto(dapr.proto.components.v1.State.DeleteRequest other) {
+    return new DeleteRequest(other.getKey(),
         other.getEtag().getValue(),
         other.getMetadataMap(),
         new StateOptions(other.getOptions()));

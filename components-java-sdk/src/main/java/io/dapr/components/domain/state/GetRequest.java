@@ -48,6 +48,6 @@ public record GetRequest(String key, Map<String, String> metadata, StateConsiste
   public GetRequest(dapr.proto.components.v1.State.GetRequest other) {
     this(other.getKey(),
         other.getMetadataMap(),
-        StateConsistency.fromValue(other.getConsistency()));
+        StateConsistency.fromProto(other.getConsistency()));
   }
 }

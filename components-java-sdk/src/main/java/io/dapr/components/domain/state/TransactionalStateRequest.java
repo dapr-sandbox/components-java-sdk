@@ -13,6 +13,8 @@
 
 package io.dapr.components.domain.state;
 
+import dapr.proto.components.v1.State;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -46,5 +48,32 @@ public record TransactionalStateRequest(List<TransactionableOperation> operation
             + operation.getClass().toString() + " is not a valid TransactionableOperation");
       }
     }
+  }
+
+  static TransactionableOperation operationFromProto(final State.TransactionalStateOperation op) {
+    Objects.requireNonNull(op);
+    if (op.hasSet()) {
+      return SetRequest.fromProto(op.getSet());
+    } else if (op.hasDelete()) {
+      return DeleteRequest.fromProto(op.getDelete());
+    } else {
+      // TODO use a better exception
+      throw new UnsupportedOperationException("Unsupported Transactionable Operation " + op);
+    }
+  }
+
+  /**
+   * Conversion from protocol buffers.
+   *
+   * @param other The Protocol Buffer representation of a TransactionalStateRequest.
+   * @return The provided protocol buffer object converted into the local domain.
+   */
+  public static TransactionalStateRequest fromProto(State.TransactionalStateRequest other) {
+    final List<TransactionableOperation> operations = other.getOperationsList()
+        .stream()
+        .map(TransactionalStateRequest::operationFromProto)
+        .toList();
+
+    return new TransactionalStateRequest(operations, other.getMetadataMap());
   }
 }
