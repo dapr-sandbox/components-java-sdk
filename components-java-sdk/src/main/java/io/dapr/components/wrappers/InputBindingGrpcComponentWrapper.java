@@ -57,19 +57,16 @@ public class InputBindingGrpcComponentWrapper extends InputBindingGrpc.InputBind
   public StreamObserver<Bindings.ReadRequest> read(StreamObserver<Bindings.ReadResponse> responseObserver) {
     // First, convert the input requests to first request and acknowledgments Flux,
     // so we can feed it to our component
-    final RequestStreamToFluxAdaptor<Bindings.ReadRequest> requestAdaptor;
-    requestAdaptor = new RequestStreamToFluxAdaptor<>((firstProto, acksProtoFlux) -> {
-      // Alright... what to do when we start receiving requests?
-      // First, let's convert those requests to the local domain.
-      final ReadRequest firstRequest = ReadRequest.fromProto(firstProto);
-      final Flux<ReadRequest> acksFlux = acksProtoFlux.map(ReadRequest::fromProto);
+    final RequestStreamToFluxAdaptor<Bindings.ReadRequest> requestAdaptor = new RequestStreamToFluxAdaptor<>();
+    // Alright... what to do when we start receiving requests?
+    // First, let's convert those requests to the local domain.
+    final Flux<ReadRequest> acksFlux = requestAdaptor.flux().map(ReadRequest::fromProto);
 
-      // Push these requests to the component...
-      inputBinding.read(firstRequest, acksFlux)
-          // ... connect its response flux to the output stream from this RPC
-          .map(ReadResponse::toProto)
-          .subscribe(responseObserver::onNext, responseObserver::onError, responseObserver::onCompleted);
-    });
+    // Push these requests to the component...
+    inputBinding.read(acksFlux)
+        // ... connect its response flux to the output stream from this RPC
+        .map(ReadResponse::toProto)
+        .subscribe(responseObserver::onNext, responseObserver::onError, responseObserver::onCompleted);
 
     // Finally, return the StreamObserver
     return requestAdaptor.requestStreamObserver();

@@ -27,10 +27,9 @@ public interface InputBinding extends InitializableWithProperties, Pingable {
    * will close the stream and return the status on any error. In case of closed
    * connection, the client should re-establish the stream.
    *
-   * @param first The initial request object.
    * @param acks A flux representing stream of acknowledgements sent back by the client
    *            to the component.
    * @return A Flux containing the responses returned by the component.
    */
-  Flux<ReadResponse> read(ReadRequest first, Flux<ReadRequest> acks);
+  Flux<ReadResponse> read(Flux<ReadRequest> acks);
 }
