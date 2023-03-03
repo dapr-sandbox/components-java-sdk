@@ -22,12 +22,16 @@ import io.dapr.v1.ComponentProtos;
 import io.grpc.stub.StreamObserver;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.Objects;
 
 public class InputBindingGrpcComponentWrapper extends InputBindingGrpc.InputBindingImplBase {
 
   private final InputBinding inputBinding;
+
+  private final Scheduler scheduler = Schedulers.boundedElastic();
 
   public InputBindingGrpcComponentWrapper(InputBinding inputBinding) {
     this.inputBinding = Objects.requireNonNull(inputBinding);
@@ -62,9 +66,16 @@ public class InputBindingGrpcComponentWrapper extends InputBindingGrpc.InputBind
     // First, let's convert those requests to the local domain.
     final Flux<ReadRequest> acksFlux = requestAdaptor.flux().map(ReadRequest::fromProto);
 
-    // Push these requests to the component...
-    inputBinding.read(acksFlux)
-        // ... connect its response flux to the output stream from this RPC
+    // Wrap everything in a Flux. This will keep uniformity with other handlers and will allow for
+    // delegating multithreading processing of requests to another thread by means of subscribeOn(scheduler)
+    Flux.just(acksFlux)
+        // Push these requests to the component.
+        .flatMap(inputBinding::read)
+        // Move processing to a different thread -- otherwise we would get stuck in the line above
+        // and this method would not return. See
+        // https://projectreactor.io/docs/core/release/reference/#producing.create
+        .subscribeOn(scheduler, false)
+        // Connect its response flux to the output stream from this RPC
         .map(ReadResponse::toProto)
         .subscribe(responseObserver::onNext, responseObserver::onError, responseObserver::onCompleted);
 

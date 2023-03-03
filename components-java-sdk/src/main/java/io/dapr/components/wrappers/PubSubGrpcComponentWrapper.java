@@ -24,12 +24,16 @@ import io.dapr.v1.ComponentProtos;
 import io.grpc.stub.StreamObserver;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.Objects;
 
 public class PubSubGrpcComponentWrapper extends PubSubGrpc.PubSubImplBase {
 
   private final PubSub pubSub;
+
+  private final Scheduler scheduler = Schedulers.boundedElastic();
 
   /**
    * Constructor.
@@ -92,8 +96,15 @@ public class PubSubGrpcComponentWrapper extends PubSubGrpc.PubSubImplBase {
       final Topic topic = Topic.fromProto(firstProto);
       final Flux<PullMessageAcknowledgement> acksFlux = acksProtoFlux.map(PullMessageAcknowledgement::fromProto);
 
-      // Push these requests to the component...
-      pubSub.pullMessages(topic, acksFlux)
+      // Wrap everything in a Flux. This will keep uniformity with other handlers and will allow for
+      // delegating multithreading processing of requests to another thread by means of subscribeOn(scheduler)
+      Flux.just(acksFlux)
+          // Push these requests to the component.
+          .flatMap(acks -> pubSub.pullMessages(topic, acks))
+          // Move processing to a different thread -- otherwise we would get stuck in the line above
+          // and this method would not return. See
+          // https://projectreactor.io/docs/core/release/reference/#producing.create
+          .subscribeOn(scheduler, false)
           // ... connect its response flux to the output stream from this RPC
           .map(PullMessagesResponse::toProto)
           .subscribe(responseObserver::onNext, responseObserver::onError, responseObserver::onCompleted);
