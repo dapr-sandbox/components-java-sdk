@@ -49,15 +49,17 @@ public record PullMessagesResponse(ByteString data, String topicName, Map<String
   }
 
   /**
-   * Conversion constructor.
+   * Conversion to protocol buffers.
    *
-   * @param other The Protocol Buffer representation of a PublishRequest.
+   * @return the Protocol buffer equivalent of this object.
    */
-  public PullMessagesResponse(dapr.proto.components.v1.Pubsub.PullMessagesResponse other) {
-    this(other.getData(),
-        other.getTopicName(),
-        other.getMetadataMap(),
-        other.getContentType(),
-        other.getId());
+  public dapr.proto.components.v1.Pubsub.PullMessagesResponse toProto() {
+    return dapr.proto.components.v1.Pubsub.PullMessagesResponse.newBuilder()
+        .setData(data)
+        .setTopicName(topicName)
+        .putAllMetadata(metadata)
+        .setContentType(contentType)
+        .setId(id)
+        .build();
   }
 }

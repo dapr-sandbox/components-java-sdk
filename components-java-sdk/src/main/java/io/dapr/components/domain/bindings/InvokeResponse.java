@@ -14,6 +14,7 @@
 package io.dapr.components.domain.bindings;
 
 import com.google.protobuf.ByteString;
+import dapr.proto.components.v1.Bindings;
 
 import java.util.Map;
 import java.util.Objects;
@@ -38,5 +39,18 @@ public record InvokeResponse(ByteString data, Map<String, String> metadata, Stri
     // All this constructor just so we can make this Map unmodifiable and this class immutable ;)
     this.metadata = Map.copyOf(Objects.requireNonNull(metadata));
     this.contentType = Objects.requireNonNull(contentType);
+  }
+
+  /**
+   * Convert POJO to gRPC/Protocol Buffer object.
+   *
+   * @return an equivalent protocol buffer object.
+   */
+  public Bindings.InvokeResponse toProto() {
+    return Bindings.InvokeResponse.newBuilder()
+        .setData(this.data)
+        .putAllMetadata(this.metadata)
+        .setContentType(this.contentType)
+        .build();
   }
 }

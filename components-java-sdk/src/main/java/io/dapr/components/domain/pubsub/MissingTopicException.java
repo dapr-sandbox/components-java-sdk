@@ -13,20 +13,10 @@
 
 package io.dapr.components.domain.pubsub;
 
-import java.util.Optional;
-
-public record PullMessagesRequest(Topic topic, String ackMessageId, Optional<String> ackErrorMessage) {
-
-  /**
-   * Conversion constructor.
-   *
-   * @param other The Protocol Buffer representation of a PullMessagesRequest.
-   */
-  public PullMessagesRequest(dapr.proto.components.v1.Pubsub.PullMessagesRequest other) {
-    this(new Topic(other.getTopic()),
-        other.getAckMessageId(),
-        other.hasAckError()
-            ? Optional.of(other.getAckError().getMessage())
-            : Optional.empty());
-  }
+/**
+ * Signals that an error was found while trying to parse a
+ * {@link dapr.proto.components.v1.Pubsub.PullMessagesRequest} into
+ * a {@link Topic} because it came with a topic field missing.
+ */
+class MissingTopicException extends IllegalArgumentException {
 }

@@ -14,6 +14,7 @@
 package io.dapr.components.domain.bindings;
 
 import com.google.protobuf.ByteString;
+import dapr.proto.components.v1.Bindings;
 
 import java.util.Map;
 import java.util.Objects;
@@ -42,5 +43,19 @@ public record ReadResponse(ByteString data, Map<String, String> metadata, String
     this.metadata = Map.copyOf(Objects.requireNonNull(metadata));
     this.contentType = Objects.requireNonNull(contentType);
     this.messageId = Objects.requireNonNull(messageId);
+  }
+
+  /**
+   * Conversion method.
+   *
+   * @return The provided object converted to its protocol buffer equivalent.
+   */
+  public Bindings.ReadResponse toProto() {
+    return Bindings.ReadResponse.newBuilder()
+        .setData(data)
+        .putAllMetadata(metadata)
+        .setContentType(contentType)
+        .setMessageId(messageId)
+        .build();
   }
 }

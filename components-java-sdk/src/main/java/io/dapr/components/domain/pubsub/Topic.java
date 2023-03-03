@@ -14,6 +14,7 @@
 package io.dapr.components.domain.pubsub;
 
 import dapr.proto.components.v1.Pubsub;
+import reactor.core.publisher.Flux;
 
 import java.util.Map;
 import java.util.Objects;
@@ -45,5 +46,23 @@ public record Topic(String name, Map<String, String> metadata) {
   public Topic(Pubsub.Topic other) {
     this(other.getName(),
         other.getMetadataMap());
+  }
+
+  /**
+   * Conversion method.
+   *
+   * @param other The  {@link dapr.proto.components.v1.Pubsub.PullMessagesRequest} from where
+   *              we will extract only its topic field. See {@link PubSub#pullMessages(Topic, Flux)}
+   *              for details.
+   * @return the topic field from the {@link dapr.proto.components.v1.Pubsub.PullMessagesRequest}
+   * @throws MissingTopicException if the {@link dapr.proto.components.v1.Pubsub.PullMessagesRequest} does not
+   *         have a topic set.
+   */
+  public static Topic fromProto(dapr.proto.components.v1.Pubsub.PullMessagesRequest other) {
+    if (!other.hasTopic()) {
+      throw new MissingTopicException();
+    }
+
+    return new Topic(other.getTopic());
   }
 }
