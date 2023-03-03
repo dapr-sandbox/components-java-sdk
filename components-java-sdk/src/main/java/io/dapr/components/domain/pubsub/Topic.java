@@ -14,7 +14,6 @@
 package io.dapr.components.domain.pubsub;
 
 import dapr.proto.components.v1.Pubsub;
-import io.dapr.components.domain.pubsub.exceptions.MissingTopicException;
 import reactor.core.publisher.Flux;
 
 import java.util.Map;

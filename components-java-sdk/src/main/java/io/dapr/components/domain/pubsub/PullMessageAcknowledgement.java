@@ -13,8 +13,6 @@
 
 package io.dapr.components.domain.pubsub;
 
-import io.dapr.components.domain.pubsub.exceptions.InvalidAcknowledgementMessageException;
-
 import java.util.Optional;
 
 /**

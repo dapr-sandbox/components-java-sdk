@@ -11,14 +11,12 @@
  * limitations under the License.
  */
 
-package io.dapr.components.domain.pubsub.exceptions;
-
-import io.dapr.components.domain.pubsub.Topic;
+package io.dapr.components.domain.pubsub;
 
 /**
  * Signals that an error was found while trying to parse a
  * {@link dapr.proto.components.v1.Pubsub.PullMessagesRequest} into
  * a {@link Topic} because it came with a topic field missing.
  */
-public class MissingTopicException extends IllegalArgumentException {
+class MissingTopicException extends IllegalArgumentException {
 }

@@ -11,14 +11,12 @@
  * limitations under the License.
  */
 
-package io.dapr.components.domain.pubsub.exceptions;
-
-import io.dapr.components.domain.pubsub.PullMessageAcknowledgement;
+package io.dapr.components.domain.pubsub;
 
 /**
  * Signals that an error was found while trying to parse a
  * {@link dapr.proto.components.v1.Pubsub.PullMessagesRequest} into
  * a {@link PullMessageAcknowledgement} because it came with a topic field set.
  */
-public class InvalidAcknowledgementMessageException extends IllegalArgumentException {
+class InvalidAcknowledgementMessageException extends IllegalArgumentException {
 }
