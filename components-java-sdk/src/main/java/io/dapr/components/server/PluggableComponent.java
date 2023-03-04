@@ -14,8 +14,18 @@
 package io.dapr.components.server;
 
 import com.google.common.collect.ImmutableList;
+import io.dapr.components.domain.bindings.InputBinding;
+import io.dapr.components.domain.bindings.OutputBinding;
+import io.dapr.components.domain.pubsub.PubSub;
+import io.dapr.components.domain.state.QueriableStateStore;
 import io.dapr.components.domain.state.StateStore;
+import io.dapr.components.domain.state.TransactionalStateStore;
+import io.dapr.components.wrappers.InputBindingGrpcComponentWrapper;
+import io.dapr.components.wrappers.OutputBindingGrpcComponentWrapper;
+import io.dapr.components.wrappers.PubSubGrpcComponentWrapper;
+import io.dapr.components.wrappers.QueriableStateStoreComponentWrapper;
 import io.dapr.components.wrappers.StateStoreGrpcComponentWrapper;
+import io.dapr.components.wrappers.TransactionalStateStoreComponentWrapper;
 import io.grpc.BindableService;
 
 import java.util.ArrayList;
@@ -48,6 +58,9 @@ public final class PluggableComponent {
 
   // A given component API (state store, pubusb, binding etc) can be registered only once.
   private boolean alreadyAddedStateStore = false;
+  private boolean alreadyAddedPubSub = false;
+  private boolean alreadyAddedInputBinding = false;
+  private boolean alreadyAddedOutputBinding = false;
 
   /**
    * Creates a new pluggable component.
@@ -69,28 +82,79 @@ public final class PluggableComponent {
   }
 
   /**
-   * Register a new StateStore with this pluggable component.
+   * Register a new {@link StateStore} with this pluggable component.
    *
    * @param stateStore The stateStore instance we want to expose through this pluggable component.
+   *                   If this instance implements {@link QueriableStateStore} and/or {@link TransactionalStateStore}
+   *                   these "facets" will also be exposed by this component.
    * @return The current {@link PluggableComponent} instance, so calls can be chained.
    */
   public PluggableComponent withStateStore(StateStore stateStore) {
-    assert !alreadyAddedStateStore; // No, you cannot add multiple stateStores
+    Objects.requireNonNull(stateStore);
+    assert !alreadyAddedStateStore; // No, you cannot add multiple stateStores with the same name.
+    alreadyAddedStateStore = true;
 
     exposedServices.add(new StateStoreGrpcComponentWrapper(stateStore));
-
     // Register other facets of a stateStore like QueriableStateStore and TransactionalStateStore
     // IFF the current stateStore object supports those facets.
-    //
-    // if (stateStore instanceof QueriableStateStore) {
-    //   exposedServices.add(new QueriableStateStoreGrpcComponentWrapper(stateStore));
-    // }
-    // if (stateStore instanceof TransactionalStateStore) {
-    //   exposedServices.add(new TransactionalStateStoreGrpcComponentWrapper(stateStore));
-    // }
+    if (stateStore instanceof QueriableStateStore queriableStore) {
+      exposedServices.add(new QueriableStateStoreComponentWrapper(queriableStore));
+    }
+    if (stateStore instanceof TransactionalStateStore transactionalStateStore) {
+      exposedServices.add(new TransactionalStateStoreComponentWrapper(transactionalStateStore));
+    }
 
-    // StateStore added and nothing else can be added
-    alreadyAddedStateStore = true;
+    return this;
+  }
+
+  /**
+   * Register a new {@link PubSub} with this pluggable component.
+   *
+   * @param pubSub The {@link PubSub} instance we want to expose through this pluggable component.
+   * @return The current {@link PluggableComponent} instance, so calls can be chained.
+   */
+  public PluggableComponent withPubSub(PubSub pubSub) {
+    Objects.requireNonNull(pubSub);
+    assert !alreadyAddedPubSub; // No, you cannot add multiple stateStores with the same name.
+    // This will be the only PubSub added to this component.
+    alreadyAddedPubSub = true;
+
+    exposedServices.add(new PubSubGrpcComponentWrapper(pubSub));
+
+    return this;
+  }
+
+  /**
+   * Register a new {@link InputBinding} with this pluggable component.
+   *
+   * @param inputBinding The {@link InputBinding} instance we want to expose through this pluggable component.
+   * @return The current {@link PluggableComponent} instance, so calls can be chained.
+   */
+  public PluggableComponent withInputBinding(InputBinding inputBinding) {
+    Objects.requireNonNull(inputBinding);
+    assert !alreadyAddedInputBinding; // No, you cannot add multiple stateStores with the same name.
+    // This will be the only InputBinding added to this component.
+    alreadyAddedInputBinding = true;
+
+    exposedServices.add(new InputBindingGrpcComponentWrapper(inputBinding));
+
+    return this;
+  }
+
+  /**
+   * Register a new {@link OutputBinding} with this pluggable component.
+   *
+   * @param inputBinding The {@link OutputBinding} instance we want to expose through this pluggable component.
+   * @return The current {@link PluggableComponent} instance, so calls can be chained.
+   */
+  public PluggableComponent withOutputBinding(OutputBinding inputBinding) {
+    Objects.requireNonNull(inputBinding);
+    assert !alreadyAddedOutputBinding; // No, you cannot add multiple stateStores with the same name.
+    // This will be the only OutputBinding added to this component.
+    alreadyAddedOutputBinding = true;
+
+    exposedServices.add(new OutputBindingGrpcComponentWrapper(inputBinding));
+
     return this;
   }
 
