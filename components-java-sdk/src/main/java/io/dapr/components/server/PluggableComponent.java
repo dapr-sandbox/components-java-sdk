@@ -115,7 +115,7 @@ public final class PluggableComponent {
    */
   public PluggableComponent withPubSub(PubSub pubSub) {
     Objects.requireNonNull(pubSub);
-    assert !alreadyAddedPubSub; // No, you cannot add multiple stateStores with the same name.
+    assert !alreadyAddedPubSub; // No, you cannot add multiple PubSubs with the same name.
     // This will be the only PubSub added to this component.
     alreadyAddedPubSub = true;
 
@@ -132,7 +132,7 @@ public final class PluggableComponent {
    */
   public PluggableComponent withInputBinding(InputBinding inputBinding) {
     Objects.requireNonNull(inputBinding);
-    assert !alreadyAddedInputBinding; // No, you cannot add multiple stateStores with the same name.
+    assert !alreadyAddedInputBinding; // No, you cannot add multiple InputBindings with the same name.
     // This will be the only InputBinding added to this component.
     alreadyAddedInputBinding = true;
 
@@ -149,7 +149,7 @@ public final class PluggableComponent {
    */
   public PluggableComponent withOutputBinding(OutputBinding inputBinding) {
     Objects.requireNonNull(inputBinding);
-    assert !alreadyAddedOutputBinding; // No, you cannot add multiple stateStores with the same name.
+    assert !alreadyAddedOutputBinding; // No, you cannot add multiple OutputBindings with the same name.
     // This will be the only OutputBinding added to this component.
     alreadyAddedOutputBinding = true;
 
