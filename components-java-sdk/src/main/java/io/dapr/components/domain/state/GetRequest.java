@@ -44,9 +44,10 @@ public record GetRequest(String key, Map<String, String> metadata, StateConsiste
    * Conversion constructor.
    *
    * @param other The Protocol Buffer representation of a GetRequest
+   * @return The provided protocol buffer object converted into the local domain.
    */
-  public GetRequest(dapr.proto.components.v1.State.GetRequest other) {
-    this(other.getKey(),
+  public static GetRequest fromProto(dapr.proto.components.v1.State.GetRequest other) {
+    return new GetRequest(other.getKey(),
         other.getMetadataMap(),
         StateConsistency.fromProto(other.getConsistency()));
   }

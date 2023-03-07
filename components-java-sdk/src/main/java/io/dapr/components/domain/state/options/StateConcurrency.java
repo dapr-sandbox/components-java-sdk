@@ -38,7 +38,7 @@ public enum StateConcurrency {
    * @param sdkEnum the SDK enum to convert.
    * @return The gRPC equivalent
    */
-  public State.StateOptions.StateConcurrency toProto(StateConcurrency sdkEnum) {
+  public static State.StateOptions.StateConcurrency toProto(StateConcurrency sdkEnum) {
     return switch (sdkEnum) {
       case UNSPECIFIED -> State.StateOptions.StateConcurrency.CONCURRENCY_UNSPECIFIED;
       case FIRST_WRITE -> State.StateOptions.StateConcurrency.CONCURRENCY_FIRST_WRITE;

@@ -25,6 +25,7 @@
 
         <dapr.proto.baseurl>https://raw.githubusercontent.com/dapr/dapr/v1.9.5/dapr/proto</dapr.proto.baseurl>
         <!-- Pin library dependencies to specific versions-->
+        <dapr.java-sdk.version>1.7.1</dapr.java-sdk.version>
         <grpc.version>1.42.1</grpc.version>
         <protobuf.version>3.17.3</protobuf.version>
         <springboot.version>2.3.5.RELEASE</springboot.version>
@@ -43,7 +44,7 @@
         <dependency>
             <groupId>io.dapr</groupId>
             <artifactId>dapr-sdk</artifactId>
-            <version>1.7.1</version>
+            <version>${dapr.java-sdk.version}</version>
         </dependency>
 
         <!-- ProtocolBuffers and gRPC dependencies -->
@@ -84,15 +85,6 @@
             <groupId>io.grpc</groupId>
             <artifactId>grpc-services</artifactId>
             <version>${grpc.version}</version>
-        </dependency>
-
-
-
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.7.2</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
