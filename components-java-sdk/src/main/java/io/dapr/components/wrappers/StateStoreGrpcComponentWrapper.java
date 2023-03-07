@@ -61,9 +61,10 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
     Mono.just(request)
         .flatMap(req -> stateStore.init(req.getMetadata().getPropertiesMap()))
         // Response is functionally and structurally equivalent to Empty, nothing to fill.
-        .map(response -> State.InitResponse.getDefaultInstance())
+        .thenReturn(State.InitResponse.getDefaultInstance())
         .subscribe(responseObserver::onNext, responseObserver::onError, responseObserver::onCompleted);
   }
+
 
   @Override
   public void features(final ComponentProtos.FeaturesRequest request,
@@ -83,7 +84,7 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
     Mono.just(request)
         .flatMap(req -> stateStore.ping())
         // Response is functionally and structurally equivalent to Empty, nothing to fill.
-        .map(successfulPing -> ComponentProtos.PingResponse.getDefaultInstance())
+        .thenReturn(ComponentProtos.PingResponse.getDefaultInstance())
         .subscribe(responseObserver::onNext, responseObserver::onError, responseObserver::onCompleted);
   }
 
@@ -93,7 +94,7 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
         .map(io.dapr.components.domain.state.DeleteRequest::fromProto) //Convert to local domain
         .flatMap(stateStore::delete)
         // Response is functionally and structurally equivalent to Empty, nothing to fill.
-        .map(response -> State.DeleteResponse.getDefaultInstance())
+        .thenReturn(State.DeleteResponse.getDefaultInstance())
         .subscribe(responseObserver::onNext, responseObserver::onError, responseObserver::onCompleted);
   }
 
@@ -106,8 +107,8 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
         .map(io.dapr.components.domain.state.DeleteRequest::fromProto)
         .collectList()
         // Perform the bulk operation
-        .map(this.stateStore::bulkDelete)
-        .map(response -> State.BulkDeleteResponse.getDefaultInstance())
+        .flatMap(this.stateStore::bulkDelete)
+        .thenReturn(State.BulkDeleteResponse.getDefaultInstance())
         .subscribe(responseObserver::onNext, responseObserver::onError, responseObserver::onCompleted);
   }
 
@@ -169,7 +170,7 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
         .map(SetRequest::fromProto)  // Convert to local domain/model
         .flatMap(stateStore::set)
         // Response is functionally and structurally equivalent to Empty, nothing to fill.
-        .map(response -> State.SetResponse.getDefaultInstance())
+        .thenReturn(State.SetResponse.getDefaultInstance())
         .subscribe(responseObserver::onNext, responseObserver::onError, responseObserver::onCompleted);
   }
 
@@ -183,7 +184,7 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
         // Perform the bulk operation
         .flatMap(this.stateStore::bulkSet)
         // Response is functionally and structurally equivalent to Empty, nothing to fill.
-        .map(allRequestsWereSuccessful -> State.BulkSetResponse.getDefaultInstance())
+        .thenReturn(State.BulkSetResponse.getDefaultInstance())
         .subscribe(responseObserver::onNext, responseObserver::onError, responseObserver::onCompleted);
   }
 }

@@ -49,7 +49,7 @@ public class PubSubGrpcComponentWrapper extends PubSubGrpc.PubSubImplBase {
     Mono.just(request)
         .flatMap(req -> pubSub.init(req.getMetadata().getPropertiesMap()))
         // Response is functionally and structurally equivalent to Empty, nothing to fill.
-        .map(response -> Pubsub.PubSubInitResponse.getDefaultInstance())
+        .thenReturn(Pubsub.PubSubInitResponse.getDefaultInstance())
         .subscribe(responseObserver::onNext, responseObserver::onError, responseObserver::onCompleted);
   }
 
@@ -70,7 +70,7 @@ public class PubSubGrpcComponentWrapper extends PubSubGrpc.PubSubImplBase {
     Mono.just(request)
         .flatMap(req -> pubSub.ping())
         // Response is functionally and structurally equivalent to Empty, nothing to fill.
-        .map(successfulPing -> ComponentProtos.PingResponse.getDefaultInstance())
+        .thenReturn(ComponentProtos.PingResponse.getDefaultInstance())
         .subscribe(responseObserver::onNext, responseObserver::onError, responseObserver::onCompleted);
   }
 
@@ -80,7 +80,7 @@ public class PubSubGrpcComponentWrapper extends PubSubGrpc.PubSubImplBase {
         .map(PublishRequest::fromProto)
         .flatMap(pubSub::publish)
         // Response is functionally and structurally equivalent to Empty, nothing to fill.
-        .map(success -> Pubsub.PublishResponse.getDefaultInstance())
+        .thenReturn(Pubsub.PublishResponse.getDefaultInstance())
         .subscribe(responseObserver::onNext, responseObserver::onError, responseObserver::onCompleted);
   }
 
