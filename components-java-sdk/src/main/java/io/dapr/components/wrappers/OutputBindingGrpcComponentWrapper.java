@@ -35,40 +35,48 @@ public class OutputBindingGrpcComponentWrapper extends OutputBindingGrpc.OutputB
   @Override
   public void init(Bindings.OutputBindingInitRequest request,
                    StreamObserver<Bindings.OutputBindingInitResponse> responseObserver) {
-    Mono.just(request)
+    final Bindings.OutputBindingInitResponse response = Mono.just(request)
         .flatMap(req -> outputBinding.init(req.getMetadata().getPropertiesMap()))
         // Response is functionally and structurally equivalent to Empty, nothing to fill.
-        .map(response -> Bindings.OutputBindingInitResponse.getDefaultInstance())
-        .subscribe(responseObserver::onNext, responseObserver::onError, responseObserver::onCompleted);
+        .map(success -> Bindings.OutputBindingInitResponse.getDefaultInstance())
+        .block();
+    responseObserver.onNext(response);
+    responseObserver.onCompleted();
   }
 
   @Override
   public void ping(ComponentProtos.PingRequest request, StreamObserver<ComponentProtos.PingResponse> responseObserver) {
-    Mono.just(request)
+    final ComponentProtos.PingResponse response = Mono.just(request)
         .flatMap(req -> outputBinding.ping())
         // Response is functionally and structurally equivalent to Empty, nothing to fill.
         .map(successfulPing -> ComponentProtos.PingResponse.getDefaultInstance())
-        .subscribe(responseObserver::onNext, responseObserver::onError, responseObserver::onCompleted);
+        .block();
+    responseObserver.onNext(response);
+    responseObserver.onCompleted();
   }
 
   @Override
   public void invoke(Bindings.InvokeRequest request, StreamObserver<Bindings.InvokeResponse> responseObserver) {
-    Mono.just(request)
-        .map(io.dapr.components.domain.bindings.InvokeRequest::new) // Convert to local domain/model
+    final Bindings.InvokeResponse response = Mono.just(request)
+        .map(InvokeRequest::new) // Convert to local domain/model
         .flatMap(outputBinding::invoke)
         .map(InvokeResponse::toProto) // convert back to gRPC model
-        .subscribe(responseObserver::onNext, responseObserver::onError, responseObserver::onCompleted);
+        .block();
+    responseObserver.onNext(response);
+    responseObserver.onCompleted();
   }
 
   @Override
   public void listOperations(Bindings.ListOperationsRequest request,
                              StreamObserver<Bindings.ListOperationsResponse> responseObserver) {
-    Mono.just(request)
+    final Bindings.ListOperationsResponse response = Mono.just(request)
         // ListOperations is an empty message, just like PingRequest. Nothing to read from it.
         .flatMap(req -> outputBinding.listOperations())
         .map(operations -> Bindings.ListOperationsResponse.newBuilder()
             .addAllOperations(operations)
             .build())
-        .subscribe(responseObserver::onNext, responseObserver::onError, responseObserver::onCompleted);
+        .block();
+    responseObserver.onNext(response);
+    responseObserver.onCompleted();
   }
 }
