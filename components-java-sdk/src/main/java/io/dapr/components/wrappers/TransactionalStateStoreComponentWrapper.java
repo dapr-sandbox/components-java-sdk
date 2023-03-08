@@ -36,7 +36,7 @@ public class TransactionalStateStoreComponentWrapper
         .map(TransactionalStateRequest::fromProto)
         .flatMap(transactionalStateStore::transact)
         // Response is functionally and structurally equivalent to Empty, nothing to fill.
-        .map(success -> State.TransactionalStateResponse.getDefaultInstance())
+        .thenReturn(State.TransactionalStateResponse.getDefaultInstance())
         .subscribe(responseObserver::onNext, responseObserver::onError, responseObserver::onCompleted);
   }
 }

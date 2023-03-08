@@ -44,9 +44,10 @@ public record InvokeRequest(ByteString data, Map<String, String> metadata, Strin
    * Conversion constructor.
    *
    * @param other The Protocol Buffer representation of a InvokeRequest.
+   * @return The provided protocol buffer object converted into the local domain.
    */
-  public InvokeRequest(dapr.proto.components.v1.Bindings.InvokeRequest other) {
-    this(other.getData(),
+  public static InvokeRequest fromProto(dapr.proto.components.v1.Bindings.InvokeRequest other) {
+    return new InvokeRequest(other.getData(),
         other.getMetadataMap(),
         other.getOperation());
   }

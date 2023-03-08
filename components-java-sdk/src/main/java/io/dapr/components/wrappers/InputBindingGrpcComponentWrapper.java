@@ -43,7 +43,7 @@ public class InputBindingGrpcComponentWrapper extends InputBindingGrpc.InputBind
     Mono.just(request)
         .flatMap(req -> inputBinding.init(req.getMetadata().getPropertiesMap()))
         // Response is functionally and structurally equivalent to Empty, nothing to fill.
-        .map(response -> Bindings.InputBindingInitResponse.getDefaultInstance())
+        .thenReturn(Bindings.InputBindingInitResponse.getDefaultInstance())
         .subscribe(responseObserver::onNext, responseObserver::onError, responseObserver::onCompleted);
   }
 
@@ -52,7 +52,7 @@ public class InputBindingGrpcComponentWrapper extends InputBindingGrpc.InputBind
     Mono.just(request)
         .flatMap(req -> inputBinding.ping())
         // Response is functionally and structurally equivalent to Empty, nothing to fill.
-        .map(successfulPing -> ComponentProtos.PingResponse.getDefaultInstance())
+        .thenReturn(ComponentProtos.PingResponse.getDefaultInstance())
         .subscribe(responseObserver::onNext, responseObserver::onError, responseObserver::onCompleted);
   }
 
