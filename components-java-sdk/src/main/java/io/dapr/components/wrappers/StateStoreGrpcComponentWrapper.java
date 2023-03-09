@@ -115,7 +115,7 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
   @Override
   public void get(final GetRequest request, final StreamObserver<State.GetResponse> responseObserver) {
     Mono.just(request)
-        .map(io.dapr.components.domain.state.GetRequest::new) // Convert to local domain/model
+        .map(io.dapr.components.domain.state.GetRequest::fromProto) // Convert to local domain/model
         .flatMap(stateStore::get)
         // If value is present, map it to an appropriate GetResponse object
         .map(GetResponse::toProto)
@@ -130,7 +130,7 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
     Mono.just(request)
         // Convert to local domain/model
         .flatMapIterable(BulkGetRequest::getItemsList)
-        .map(io.dapr.components.domain.state.GetRequest::new)
+        .map(io.dapr.components.domain.state.GetRequest::fromProto)
         .collectList()
         // Perform the bulk operation
         .flatMapMany(this.stateStore::bulkGet)
