@@ -1,5 +1,6 @@
 package io.dapr.components.wrappers;
 
+import com.google.common.base.Function;
 import dapr.proto.components.v1.Bindings;
 import dapr.proto.components.v1.OutputBindingGrpc;
 import io.dapr.components.domain.bindings.OutputBinding;
@@ -9,20 +10,15 @@ import io.grpc.inprocess.InProcessServerBuilder;
 import io.grpc.testing.GrpcCleanupRule;
 import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import reactor.core.publisher.Mono;
+import org.junit.jupiter.api.TestFactory;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
-import static io.dapr.components.TestUtils.assertThrowsGrpcRuntimeException;
-import static io.dapr.components.TestUtils.monoError;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 class OutputBindingGrpcComponentWrapperTest {
 
@@ -61,57 +57,21 @@ class OutputBindingGrpcComponentWrapperTest {
   // Tests for common component aspects
   //
 
-  @Test
-  void initHappyCase() {
-    final Map<String, String> expectedMetadata = Map.of("key", "value");
-
-    when(mockComponent.init(anyMap())).thenReturn(Mono.empty());
-
-    final var response = client.init(Bindings.OutputBindingInitRequest.newBuilder()
+  @TestFactory
+  List<DynamicTest> init() {
+    final Function<Map<String, String>, Bindings.OutputBindingInitRequest> initWithFeaturesFactory = (expectedMetadata) -> Bindings.OutputBindingInitRequest.newBuilder()
         .setMetadata(ComponentProtos.MetadataRequest.newBuilder()
             .putAllProperties(expectedMetadata)
             .build())
-        .build());
+        .build();
+    final Bindings.OutputBindingInitResponse defaultResponseInstance = Bindings.OutputBindingInitResponse.getDefaultInstance();
 
-    assertThat(response).as("init return just a default InitResponse")
-        .isNotNull()
-        .isEqualTo(Bindings.OutputBindingInitResponse.getDefaultInstance());
-    var capturedMetadata = ArgumentCaptor.forClass(Map.class);
-    verify(mockComponent).init(capturedMetadata.capture());
-    assertThat(capturedMetadata.getValue())
-        .as("An equivalent metadata map should be provided to the component")
-        .isNotNull()
-        .isEqualTo(expectedMetadata);
+    return AspectsTestGenerators.generateInitTests(mockComponent, client::init, initWithFeaturesFactory, defaultResponseInstance);
   }
 
-  @Test
-  void initMonoErrorThrows() {
-    when(mockComponent.init(anyMap())).thenReturn(monoError());
-
-    assertThrowsGrpcRuntimeException(() -> client.init(Bindings.OutputBindingInitRequest.getDefaultInstance()));
-  }
-
-
-  @Test
-  void pingHappyCase() {
-    when(mockComponent.ping()).thenReturn(Mono.empty());
-    final var response = client.ping(ComponentProtos.PingRequest.getDefaultInstance());
-    assertThat(response).isNotNull();
-  }
-
-  @Test
-  void pingMonoErrorThrows() {
-    when(mockComponent.ping()).thenReturn(monoError());
-
-    assertThrowsGrpcRuntimeException(() -> client.ping(ComponentProtos.PingRequest.getDefaultInstance()));
-  }
-
-  @Test
-  void pingInternalExceptionsThrows() {
-    when(mockComponent.ping())
-        .thenThrow(new RuntimeException("Ooops!"));
-
-    assertThrowsGrpcRuntimeException(() -> client.ping(ComponentProtos.PingRequest.getDefaultInstance()));
+  @TestFactory
+  List<DynamicTest> ping() {
+    return AspectsTestGenerators.generatePingTests(mockComponent, client::ping);
   }
 
 
