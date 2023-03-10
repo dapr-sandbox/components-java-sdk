@@ -5,7 +5,6 @@ import io.dapr.components.aspects.AdvertisesFeatures;
 import io.dapr.components.aspects.InitializableWithProperties;
 import io.dapr.components.aspects.Pingable;
 import io.dapr.v1.ComponentProtos;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DynamicTest;
 import org.mockito.ArgumentCaptor;
 import reactor.core.publisher.Mono;
@@ -30,12 +29,24 @@ import static org.mockito.Mockito.when;
  * {@link io.dapr.components.aspects.InitializableWithProperties}.
  */
 public class AspectsTestGenerators {
+  /**
+   * Common tests for init() methods.
+   *
+   * @param component The mocked component.
+   * @param clientInit A reference to the client stub init method.
+   * @param initWithFeaturesFactory A functor that creates instances of InitRequests appropriated
+   *                                for the component under test given a metadata properties map.
+   * @param defaultResponseInstance A provider for something similar to what your component init() returns.
+   * @return Dynamic Tests targeting your mock and client.
+   * @param <TRequest> The target API specific InitRequest type.
+   * @param <TResponse> The target API specific InitResponse type.
+   */
   // The amount of contortions we had to do to make this test generic...
   static <TRequest, TResponse> List<DynamicTest> generateInitTests(
-      InitializableWithProperties component,
-      Function<TRequest, TResponse> clientInit,
-      Function<Map<String, String>, TRequest> initWithFeaturesFactory,
-      TResponse defaultResponseInstance) {
+      final InitializableWithProperties component,
+      final Function<TRequest, TResponse> clientInit,
+      final Function<Map<String, String>, TRequest> initWithFeaturesFactory,
+      final TResponse defaultResponseInstance) {
     return List.of(
         dynamicTest("init - HappyCase", () -> {
           final Map<String, String> expectedMetadata = Map.of("key", "value");
@@ -66,7 +77,17 @@ public class AspectsTestGenerators {
     );
   }
 
-  static List<DynamicTest> generatePingTests(Pingable component, Function<ComponentProtos.PingRequest, ComponentProtos.PingResponse> clientPing) {
+  /**
+   *
+   * Common tests for ping() methods.
+   *
+   * @param component The mocked component.
+   * @param clientPing A reference to the client stub ping method.
+   * @return Dynamic Tests targeting your mock and client.
+   */
+  static List<DynamicTest> generatePingTests(
+      final Pingable component,
+      final Function<ComponentProtos.PingRequest, ComponentProtos.PingResponse> clientPing) {
     return List.of(
         dynamicTest("ping happy case", () -> {
           reset(component); // Reset mock - this is not a regular @Test
@@ -97,8 +118,16 @@ public class AspectsTestGenerators {
     );
   }
 
-  @NotNull
-  static List<DynamicTest> generateGetFeaturesTests(AdvertisesFeatures component, Function<ComponentProtos.FeaturesRequest, ComponentProtos.FeaturesResponse> clientFeatures) {
+  /**
+   * Common tests for getFeatures() methods.
+   *
+   * @param component The mocked component.
+   * @param clientFeatures A reference to the client stub getFeatures method.
+   * @return Dynamic Tests targeting your mock and client.
+   */
+  static List<DynamicTest> generateGetFeaturesTests(
+      final AdvertisesFeatures component,
+      final Function<ComponentProtos.FeaturesRequest, ComponentProtos.FeaturesResponse> clientFeatures) {
     return List.of(
         dynamicTest("features - happy case", () -> {
           final var expectedFeatures = List.of("feature1", "feature2");
