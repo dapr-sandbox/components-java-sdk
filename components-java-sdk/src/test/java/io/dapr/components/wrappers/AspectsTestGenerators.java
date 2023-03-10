@@ -51,6 +51,7 @@ public class AspectsTestGenerators {
         dynamicTest("init - HappyCase", () -> {
           final Map<String, String> expectedMetadata = Map.of("key", "value");
 
+          reset(component); // Reset mock - this is not a regular @Test
           when(component.init(anyMap())).thenReturn(Mono.empty());
 
           final TRequest initRequest = initWithFeaturesFactory.apply(expectedMetadata);
@@ -66,8 +67,19 @@ public class AspectsTestGenerators {
               .isNotNull()
               .isEqualTo(expectedMetadata);
         }),
-        dynamicTest("init - MonoErrorThrows", () -> {
+        dynamicTest("init returning a Mono.error becomes an exception on the client side", () -> {
+          reset(component); // Reset mock - this is not a regular @Test
           when(component.init(anyMap())).thenReturn(monoError());
+
+          final TRequest initRequest = initWithFeaturesFactory.apply(Collections.emptyMap());
+
+          assertThrowsGrpcRuntimeException(() -> clientInit.apply(initRequest));
+          verify(component, times(1)).init(Collections.emptyMap());
+        }),
+        dynamicTest("init throwing an exception also becomes an exception on the client side", () -> {
+          reset(component); // Reset mock - this is not a regular @Test
+          when(component.init(anyMap()))
+              .thenThrow(new RuntimeException("Ops! Ping was called and I didn't know what to do!"));
 
           final TRequest initRequest = initWithFeaturesFactory.apply(Collections.emptyMap());
 
