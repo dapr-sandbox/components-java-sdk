@@ -92,4 +92,26 @@ public record GetResponse(ByteString data, String etag, Map<String, String> meta
         .setContentType(contentType)
         .build();
   }
+
+  /**
+   * Conversion method.
+   *
+   * @param requestedItemKey The key that associated with this item in the BulkGetRequest
+   *
+   * @return The provided object converted to a State.BulkStateItem protocol buffer equivalent.
+   */
+  public State.BulkStateItem toBulkGetItemProto(final String requestedItemKey) {
+    return State.BulkStateItem.newBuilder()
+        // bulkGet specific fields
+        .setKey(requestedItemKey)
+        .setError(BulkGetError.NONE)
+        // Fields shared with GetResponse
+        .setData(data)
+        .setEtag(State.Etag.newBuilder()
+            .setValue(etag)
+            .build())
+        .putAllMetadata(metadata)
+        .setContentType(contentType)
+        .build();
+  }
 }
