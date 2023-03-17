@@ -13,14 +13,9 @@
 
 package io.dapr.components.wrappers;
 
-import io.dapr.components.domain.bindings.ReadRequest;
-import io.dapr.components.domain.pubsub.PublishRequest;
 import io.grpc.stub.StreamObserver;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
-
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import static reactor.core.publisher.Sinks.EmitFailureHandler.FAIL_FAST;
 

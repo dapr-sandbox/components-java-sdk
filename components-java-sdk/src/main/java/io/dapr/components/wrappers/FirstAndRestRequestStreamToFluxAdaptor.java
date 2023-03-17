@@ -13,8 +13,6 @@
 
 package io.dapr.components.wrappers;
 
-import io.dapr.components.domain.bindings.ReadRequest;
-import io.dapr.components.domain.pubsub.PublishRequest;
 import io.dapr.components.domain.pubsub.Topic;
 import io.grpc.stub.StreamObserver;
 import reactor.core.publisher.Flux;
