@@ -137,22 +137,14 @@ public class StateStoreGrpcComponentWrapper extends StateStoreGrpc.StateStoreImp
         // Let's convert all requested items into BulkStateItems objects.
         .flatMap(requestedItem -> requestedItem.response()
             // If value is present, convert it to an appropriate BulkStateItem object
-            .map(value -> BulkStateItem.newBuilder()
-                .setKey(requestedItem.key())
-                .setData(value.data())
-                .setEtag(Etag.newBuilder()
-                    .setValue(value.etag())
-                    .build())
-                .setError(BulkGetError.NONE)
-                .build()
-            )
+            .map(value -> value.toBulkGetItemProto(requestedItem.key()))
             // otherwise return an empty BulkStateItem with corresponding error codes
             .defaultIfEmpty(
                 BulkStateItem.newBuilder()
                     .setKey(requestedItem.key())
+                    .setError(BulkGetError.KEY_DOES_NOT_EXIST)
                     .setData(ByteString.EMPTY)
                     .setEtag(EMPTY_ETAG)
-                    .setError(BulkGetError.KEY_DOES_NOT_EXIST)
                     .build()
             )
         )
