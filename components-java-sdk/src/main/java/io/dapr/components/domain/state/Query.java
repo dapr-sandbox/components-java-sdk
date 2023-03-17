@@ -13,7 +13,6 @@
 
 package io.dapr.components.domain.state;
 
-import com.google.protobuf.Any;
 import dapr.proto.components.v1.State;
 
 import javax.annotation.Nullable;

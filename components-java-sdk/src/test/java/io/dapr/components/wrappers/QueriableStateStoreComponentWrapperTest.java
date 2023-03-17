@@ -4,9 +4,7 @@ import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
 import dapr.proto.components.v1.QueriableStateStoreGrpc;
 import dapr.proto.components.v1.State;
-import io.dapr.components.domain.bindings.InvokeRequest;
 import io.dapr.components.domain.state.QueriableStateStore;
-import io.dapr.components.domain.state.Query;
 import io.dapr.components.domain.state.QueryRequest;
 import io.dapr.components.domain.state.QueryResponse;
 import io.dapr.components.domain.state.QueryResponseItem;
@@ -24,17 +22,20 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import static io.dapr.components.TestData.CONTENT_TYPE;
+import static io.dapr.components.TestData.ETAG_VALUE;
+import static io.dapr.components.TestData.METADATA_REQUEST_MAP;
+import static io.dapr.components.TestData.METADATA_RESPONSE_MAP;
+import static io.dapr.components.TestData.TEST_KEY;
+import static io.dapr.components.TestData.TEST_KEY_2;
+import static io.dapr.components.TestData.TEST_VALUE;
+import static io.dapr.components.TestData.TEST_VALUE_2;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import static io.dapr.components.TestData.*;
 
 class QueriableStateStoreComponentWrapperTest {
 
