@@ -126,13 +126,14 @@ class OutputBindingGrpcComponentWrapperTest {
 
   @Test
   void listOperations() {
-    when(mockComponent.listOperations()).thenReturn(Mono.just(List.of(OPERATION_NAME)));
+    final List<String> expectedOperationList = List.of(OPERATION_NAME);
+    when(mockComponent.listOperations()).thenReturn(Mono.just(expectedOperationList));
 
     final Bindings.ListOperationsResponse response =
         client.listOperations(Bindings.ListOperationsRequest.newBuilder().build());
 
     verify(mockComponent, times(1)).listOperations();
     assertThat(response).isNotNull();
-    assertThat(response.getOperationsList()).contains(OPERATION_NAME);
+    assertThat(response.getOperationsList()).isEqualTo(expectedOperationList);
   }
 }
