@@ -70,7 +70,7 @@
       <property name="allowByTailComment" value="true"/>
       <property name="allowNonPrintableEscapes" value="true"/>
     </module>
-    <module name="AvoidStarImport"/>
+
     <module name="OneTopLevelClass"/>
     <module name="NoLineWrap"/>
     <module name="EmptyBlock">
@@ -274,6 +274,8 @@
     </module>
     <module name="CommentsIndentation"/>
 
+    <!-- Import related rules -->
+    <module name="AvoidStarImport"/>
     <module name="ImportOrder">
       <property name="groups" value="*,javax,java"/>
       <property name="ordered" value="true"/>
@@ -281,6 +283,8 @@
       <property name="option" value="bottom"/>
       <property name="sortStaticImportsAlphabetically" value="true"/>
     </module>
+    <module name="UnusedImports"/>
+
     <module name="SuppressionXpathSingleFilter">
       <property name="checks" value="ImportOrder"/>
       <property name="message" value="^'java\..*'.*"/>
